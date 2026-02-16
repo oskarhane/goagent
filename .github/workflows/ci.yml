@@ -70,8 +70,10 @@ jobs:
       uses: actions/setup-go@v5
       with:
         go-version: '1.26'
+        cache: false
+
+    - name: Install gosec
+      run: go install github.com/securego/gosec/v2/cmd/gosec@latest
 
     - name: Run Gosec Security Scanner
-      uses: securego/gosec@master
-      with:
-        args: './...'
+      run: gosec ./...
