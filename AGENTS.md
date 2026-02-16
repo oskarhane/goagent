@@ -112,7 +112,7 @@
 - **Example completeness**: Include .env.example files, READMEs, go.mod for each example
 - **Godotenv pattern**: Use _ "github.com/joho/godotenv/autoload" for easy .env loading in examples
 - **Example output notes**: Add variability disclaimer for token counts/iterations; actual values vary by LLM
-- **Model references**: Use real model names (gpt-4, gpt-4-turbo); avoid non-existent model IDs (gpt-5.1)
+- **Model references**: Use real model names (gpt-5.1, gpt-5-mini, gpt-5 for OpenAI; gemini-2.5-pro, gemini-2.5-flash for Vertex)
 
 ## Testing
 

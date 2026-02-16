@@ -65,7 +65,7 @@ This example implements a two-tier agent hierarchy:
 
 ## Prerequisites
 
-- **OpenAI API key** - For LLM reasoning (gpt-4 or compatible model)
+- **OpenAI API key** - For LLM reasoning (gpt-5.1 or compatible model)
 - **Go 1.26+**
 
 ## Quick Start
@@ -450,6 +450,6 @@ go test ./...
 - Total: 15-35 seconds for typical incident
 
 **Cost optimization:**
-- Use smaller models for investigator agents (gpt-4-turbo or gpt-3.5-turbo)
-- Use larger models for coordinator synthesis (gpt-4)
+- Use smaller models for investigator agents (gpt-5-mini)
+- Use larger models for coordinator synthesis (gpt-5.1)
 - Limit investigator iterations to reduce token usage
