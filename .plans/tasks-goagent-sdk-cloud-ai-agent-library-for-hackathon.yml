@@ -37,7 +37,7 @@ tasks:
     title: "Implement OpenAI provider"
     description: |
       Create OpenAI provider implementation with authentication, API calls, and response parsing. Include rate limiting and error handling with exponential backoff.
-    status: pending
+    status: completed
     dependencies:
       - task-002
     acceptance_criteria:
@@ -46,7 +46,8 @@ tasks:
       - "Rate limiting implemented with exponential backoff"
       - "Error handling provides clear error messages"
       - "Context cancellation supported"
-    completed_at: null
+      - "can use API key from environment variable (.env file + plain environment variable)"
+    completed_at: 2026-02-16T15:30:00.000Z
 
   - id: task-004
     title: "Implement Vertex AI provider"

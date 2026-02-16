@@ -24,3 +24,9 @@
 - **Struct field order**: Group logically (identity fields first, then content, then metadata) for API stability
 - **JSON tag consistency**: Use omitempty for optional fields; explicit tags prevent refactor breakage
 - **Helper constructors**: Provide NewXMessage() functions for common message types (better UX)
+## Provider Implementation
+
+- **Request mutation**: Copy pointer params before modification to avoid mutating caller's data
+- **.env support**: Document external .env loading (godotenv) rather than embedding it in provider
+- **Retryable errors**: 429, 500, 502, 503, 504 are retryable; use exponential backoff (2^n seconds)
+- **Context cancellation**: Check ctx.Err() after network failures and in retry loops
