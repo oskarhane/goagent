@@ -145,3 +145,24 @@ Key Decisions:
 - Tests cover edge cases: empty messages, malformed JSON, missing tool calls
 
 Next Task: task-008
+================================================================================
+TASK-008: Write comprehensive README with architecture
+Date: 2026-02-16T16:34:03.000Z
+================================================================================
+
+Summary:
+Expanded README.md from skeleton to 454-line comprehensive documentation. Added ASCII architecture diagram, detailed quickstart, pattern guidance, complete code walkthrough of all components, example output, customization patterns, testing instructions, and troubleshooting. Applied review feedback addressing model name accuracy and output variability notation.
+
+Files Changed:
+- examples/agent-as-tool/README.md (modified - expanded from skeleton to comprehensive docs with architecture diagram, walkthrough, examples)
+
+Key Decisions:
+- ASCII architecture diagram shows coordinator→investigator delegation with tool flow
+- "When to Use This Pattern" section provides clear guidance on hierarchical vs single-agent patterns
+- Code walkthrough covers all 5 components (mocks, investigator, agent_tool, coordinator, scenarios)
+- Example output included with note about variability (iteration counts, tokens vary by LLM)
+- Model references changed from non-existent gpt-5.1 to realistic gpt-4/gpt-4-turbo
+- Customization section shows real implementations (K8s tool, HTTP tool, multi-tier hierarchy)
+- Related examples section links to incident-response, k8s-monitoring, agent-basic, tools-basic
+
+Next Task: task-009

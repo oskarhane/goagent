@@ -114,7 +114,7 @@ tasks:
     title: "Write comprehensive README with architecture"
     description: |
       Document the agent-as-tool pattern in README.md. Include architecture diagram (ASCII or description), quickstart instructions, explanation of hierarchical delegation, code walkthrough, and example output. Document when to use this pattern vs single agent. Follow READMEs from other examples.
-    status: pending
+    status: completed
     dependencies:
       - task-007
     acceptance_criteria:
@@ -124,7 +124,7 @@ tasks:
       - "Code walkthrough of key components"
       - "Example output showing delegation"
       - "Following markdown format from other examples"
-    completed_at: null
+    completed_at: 2026-02-16T16:34:03.000Z
 
   - id: task-009
     title: "Add integration test for agent-as-tool example"

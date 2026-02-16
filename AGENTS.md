@@ -111,6 +111,8 @@
 - **Registry pattern**: tools.NewRegistry() + registry.MustRegister(tool, handler) is correct setup
 - **Example completeness**: Include .env.example files, READMEs, go.mod for each example
 - **Godotenv pattern**: Use _ "github.com/joho/godotenv/autoload" for easy .env loading in examples
+- **Example output notes**: Add variability disclaimer for token counts/iterations; actual values vary by LLM
+- **Model references**: Use real model names (gpt-4, gpt-4-turbo); avoid non-existent model IDs (gpt-5.1)
 
 ## Testing
 
