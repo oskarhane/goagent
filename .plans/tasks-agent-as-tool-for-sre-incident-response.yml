@@ -174,3 +174,14 @@ tasks:
       - "All acceptance criteria from PRD verified"
       - "Follow README to verify that the instructions are valid and correct"
     completed_at: 2026-02-16T23:00:00.000Z
+
+  - id: task-012
+    title: "Make the example faster"
+    description: |
+      Now it takes around 90 seconds using a normal model. This needs to be faster (using the same model).
+      Do not change the model, just change the code or example.
+    status: completed
+    dependencies:
+    acceptance_criteria:
+      - "finishes in <60 seconds using the current configured model"
+    completed_at: 2026-02-16T18:15:00.000Z

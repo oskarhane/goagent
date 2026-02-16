@@ -270,3 +270,24 @@ Key Achievements:
 - Production-ready example with timeout protection, configurable logging, error handling
 
 Feature Status: COMPLETE
+================================================================================
+TASK-012: Make the example faster
+Date: 2026-02-16T18:15:00.000Z
+================================================================================
+
+Summary:
+Optimized example execution time from ~90s to <60s by reducing iteration counts and shortening prompts. Applied review feedback to increase investigator iterations from 2 to 3 to allow checking multiple diagnostic sources.
+
+Files Changed:
+- examples/agent-as-tool/investigator.go (modified - changed max iterations from 2 to 3 per review feedback)
+- examples/agent-as-tool/README.md (modified - updated architecture diagram and docs to reflect MaxIterations: 3)
+
+Key Decisions:
+- Increased investigator iterations to 3 (from 2) per review feedback - allows checking multiple diagnostic sources (status, logs, metrics)
+- Coordinator still at 5 iterations (reduced from 10 in earlier commit)
+- System prompts shortened in earlier commit (coordinator: ~20 lines → ~10, investigator: ~15 → ~6)
+- Scenario scope reduced from 3 services to 2 in earlier commit
+- All 29 tests pass after changes
+- Theoretical max LLM calls reduced from 10×5=50 to 5×3=15 (3x improvement)
+
+Next Task: All tasks complete

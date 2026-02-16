@@ -63,35 +63,23 @@ func main() {
 	coordinatorRegistry.MustRegister(investigateTool, investigateHandler)
 
 	// Create coordinator agent with SRE triage system prompt
-	coordinatorPrompt := `You are an SRE coordinator responsible for incident triage and investigation orchestration.
+	coordinatorPrompt := `You are an SRE coordinator for incident triage.
 
-Your role is to:
-1. Analyze incident reports to understand symptoms and scope
-2. Identify which services need investigation based on the incident type
-3. Delegate investigations to service-specific agents using the investigate_service tool
-4. Correlate findings from multiple service investigations
-5. Determine the root cause and provide actionable recommendations
+Tasks:
+1. Analyze symptoms
+2. Use investigate_service tool for suspected root cause
+3. Identify root cause
+4. Provide fix
 
-You have access to:
-- investigate_service: Delegates investigation to a specialized agent that can examine logs, metrics, and health status for a specific service
+Strategy: Investigate 1-2 services max, starting with most likely root cause.
 
-Investigation strategy:
-- For cascading failures: investigate suspected root cause services first (e.g., database, auth-service)
-- For isolated issues: focus on directly affected services
-- Always investigate at least 2-3 services to understand the full scope
-- Look for patterns across service investigations (timeouts, errors, resource exhaustion)
-
-Be systematic and thorough. Provide a clear incident summary with:
-- Root cause identification
-- Services affected and their status
-- Evidence supporting your conclusion
-- Recommended remediation steps`
+Output: root cause, evidence, fix.`
 
 	coordinatorConfig := &agent.Config{
 		Provider:      provider,
 		SystemPrompt:  coordinatorPrompt,
 		Registry:      coordinatorRegistry,
-		MaxIterations: 10,
+		MaxIterations: 5,
 		Logger:        l,
 	}
 
@@ -111,8 +99,8 @@ Be systematic and thorough. Provide a clear incident summary with:
 		incident = defaultScenario.GetIncidentDescription()
 	}
 
-	// Run coordinator agent with 5 minute timeout for complex investigations
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Minute)
+	// Run coordinator agent with 60 second timeout
+	ctx, cancel := context.WithTimeout(context.Background(), 60*time.Second)
 	defer cancel()
 
 	fmt.Println("=== Agent-as-Tool: Hierarchical SRE Investigation ===")

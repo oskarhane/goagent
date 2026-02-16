@@ -24,10 +24,10 @@ func NewScenarios() *Scenarios {
 			{
 				Name:             "Database Cascading Failure",
 				IncidentType:     "cascading_failure",
-				InitialReport:    "Multiple services reporting degraded performance. Users experiencing login failures and API timeouts. Started approximately 15 minutes ago with increased error rates on authentication endpoints.",
-				AffectedServices: []string{"database", "auth-service", "api-service"},
-				RootCause:        "Database connection pool exhaustion causing auth-service timeouts, leading to API service degradation",
-				Description:      "A classic cascading failure where database performance issues (slow queries, connection pool saturation) cause the auth-service to timeout, which then causes the api-service to fail authentication checks, ultimately impacting end users.",
+				InitialReport:    "Users experiencing login failures. Auth service shows high error rate. Started 15 minutes ago.",
+				AffectedServices: []string{"database", "auth-service"},
+				RootCause:        "Database connection pool exhaustion causing auth-service timeouts",
+				Description:      "Database performance issues cause auth-service to timeout.",
 			},
 			{
 				Name:             "Memory Leak in Cache Service",
@@ -82,7 +82,7 @@ func (s *Scenarios) Default() Scenario {
 
 // GetIncidentDescription formats the initial incident report for the coordinator agent
 func (s *Scenario) GetIncidentDescription() string {
-	return fmt.Sprintf("INCIDENT REPORT:\n\nType: %s\nReport: %s\n\nYour task is to investigate this incident, determine the root cause, and provide recommendations for resolution.",
+	return fmt.Sprintf("INCIDENT: %s\n%s\n\nInvestigate root cause and recommend fix.",
 		s.IncidentType,
 		s.InitialReport,
 	)

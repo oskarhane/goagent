@@ -71,7 +71,6 @@ func TestScenariosGetByName(t *testing.T) {
 		assert.Equal(t, "cascading_failure", scenario.IncidentType)
 		assert.Contains(t, scenario.AffectedServices, "database")
 		assert.Contains(t, scenario.AffectedServices, "auth-service")
-		assert.Contains(t, scenario.AffectedServices, "api-service")
 	})
 
 	t.Run("nonexistent scenario", func(t *testing.T) {
@@ -96,10 +95,9 @@ func TestScenarioGetIncidentDescription(t *testing.T) {
 
 	description := scenario.GetIncidentDescription()
 
-	assert.Contains(t, description, "INCIDENT REPORT")
+	assert.Contains(t, description, "INCIDENT")
 	assert.Contains(t, description, scenario.IncidentType)
 	assert.Contains(t, description, scenario.InitialReport)
-	assert.Contains(t, description, "investigate")
 	assert.Contains(t, description, "root cause")
 }
 
@@ -122,12 +120,10 @@ func TestCascadingFailureScenarioStructure(t *testing.T) {
 	assert.Equal(t, "Database Cascading Failure", scenario.Name)
 	assert.Equal(t, "cascading_failure", scenario.IncidentType)
 	assert.Contains(t, scenario.InitialReport, "login failures")
-	assert.Contains(t, scenario.InitialReport, "API timeouts")
 
-	// Verify the cascade order: database → auth-service → api-service
+	// Verify the cascade order: database → auth-service
 	assert.Contains(t, scenario.AffectedServices, "database")
 	assert.Contains(t, scenario.AffectedServices, "auth-service")
-	assert.Contains(t, scenario.AffectedServices, "api-service")
 
 	// Verify root cause explains the cascade
 	assert.Contains(t, scenario.RootCause, "Database")

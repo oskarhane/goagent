@@ -16,7 +16,7 @@ This example implements a two-tier agent hierarchy:
 │                    Coordinator Agent                         │
 │  Role: Triage, delegation, correlation, synthesis           │
 │  Tools: investigate_service (agent-as-tool wrapper)         │
-│  Max Iterations: 10                                          │
+│  Max Iterations: 5                                           │
 └──────────────────────────┬──────────────────────────────────┘
                            │
                            │ Delegates via investigate_service tool
@@ -27,7 +27,7 @@ This example implements a two-tier agent hierarchy:
 ┌──────────────────────┐          ┌──────────────────────┐
 │  Investigator Agent  │          │  Investigator Agent  │
 │  (auth-service)      │          │  (api-service)       │
-│  Max Iterations: 5   │   ...    │  Max Iterations: 5   │
+│  Max Iterations: 3   │   ...    │  Max Iterations: 3   │
 └────────┬─────────────┘          └────────┬─────────────┘
          │                                  │
          │ Uses diagnostic tools            │
@@ -47,7 +47,7 @@ This example implements a two-tier agent hierarchy:
 2. **Investigator Factory** (`investigator.go`):
    - `NewInvestigator(serviceName, provider, registry)`: Creates service-scoped agent
    - Dynamic system prompt includes service name and investigation methodology
-   - Max 5 iterations for focused investigation
+   - Max 3 iterations for focused investigation
 
 3. **Agent-as-Tool Wrapper** (`agent_tool.go`):
    - `NewInvestigateServiceTool()`: Defines tool schema with `service_name` and `incident_type` parameters
@@ -57,7 +57,7 @@ This example implements a two-tier agent hierarchy:
 4. **Coordinator Agent** (`main.go`):
    - Receives incident description (CLI arg or default scenario)
    - System prompt emphasizes triage, delegation, and synthesis
-   - Max 10 iterations to allow multiple service investigations
+   - Max 5 iterations to allow multiple service investigations
 
 5. **Incident Scenarios** (`scenarios.go`):
    - Pre-built scenarios: cascading failure, memory leak, dependency failure
@@ -253,7 +253,7 @@ investigator, err := NewInvestigator("auth-service", provider, mockRegistry)
 
 **Features:**
 - Dynamic system prompt includes service name 5x for contextual grounding
-- Max 5 iterations for focused investigation (prevents runaway)
+- Max 2 iterations for focused investigation (prevents runaway)
 - Access to all mock diagnostic tools
 - Defensive validation (empty service name, nil provider, nil registry)
 
