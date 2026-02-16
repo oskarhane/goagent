@@ -166,3 +166,23 @@ Key Decisions:
 - Related examples section links to incident-response, k8s-monitoring, agent-basic, tools-basic
 
 Next Task: task-009
+================================================================================
+TASK-009: Add integration test for agent-as-tool example
+Date: 2026-02-16T16:38:33.000Z
+================================================================================
+
+Summary:
+Created comprehensive integration test (TestAgentAsTool) verifying coordinator delegates to investigator agent. Implemented stateful mock provider for multi-turn conversation simulation, extraction helpers for verifying delegation and findings, and extensive assertions covering tool execution and result propagation. Applied review feedback to fix conditional assertion logic.
+
+Files Changed:
+- examples/agent-as-tool/main_test.go (created - 325 lines with TestAgentAsTool, stateful mock provider, extraction helpers, and 4 additional helper tests)
+
+Key Decisions:
+- Separate statefulMockProvider created for multi-turn tests (vs simple mockProvider in test_helpers.go)
+- Mock simulates 3-turn conversation: incident→investigate_service call→investigation result→final synthesis
+- extractInvestigatedServices verifies coordinator calls investigate_service tool with correct service name
+- extractInvestigationFindings verifies tool results contain investigation details and stats
+- Applied review feedback: changed assert.Contains to strings.Contains in conditional to avoid misleading test output on non-matching findings
+- Test verifies delegation flow, tool execution, result propagation, and execution stats (iterations, tokens, duration)
+
+Next Task: task-010

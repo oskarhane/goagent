@@ -143,6 +143,7 @@
 - **Flaky tests**: Skip timing-sensitive tests (context cancel) that can't be made deterministic
 - **Lint compliance**: Fix unused params with `_`, add missing imports, split long lines, use American spelling
 - **Complex algorithm tests**: Add dedicated unit tests for complex functions (like trimming with constraints); test edge cases thoroughly to prevent regression
+- **Conditional assertions**: Use strings.Contains in if conditions, not assert.Contains; assert only when actually asserting to avoid misleading test output
 
 ## Examples
 

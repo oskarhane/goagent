@@ -130,7 +130,7 @@ tasks:
     title: "Add integration test for agent-as-tool example"
     description: |
       Create main_test.go with integration test that verifies coordinator delegates to investigator. Use mock provider or test against real OpenAI with small max iterations. Test that mock tools execute correctly and investigator results return to coordinator. Verify error handling.
-    status: pending
+    status: completed
     dependencies:
       - task-007
     acceptance_criteria:
@@ -140,7 +140,7 @@ tasks:
       - "Tool results propagate correctly"
       - "Test passes with go test ./..."
       - "Uses testify/assert for assertions"
-    completed_at: null
+    completed_at: 2026-02-16T16:38:33.000Z
 
   - id: task-010
     title: "Verify example compiles and runs end-to-end"
