@@ -84,3 +84,18 @@
 - **Build args**: Use VERSION build arg for ldflags injection during docker build
 - **.dockerignore**: Exclude examples/, .plans/, .env files, and test artifacts to reduce context size
 - **CMD placeholder**: Use `["--help"]` as CMD for unimplemented modes (service/cronjob) rather than non-existent subcommands
+
+## Kubernetes Deployment
+
+- **RBAC minimum**: Start with namespace-scoped Role; only use ClusterRole for cross-namespace queries
+- **RBAC namespace**: Don't hardcode namespace in RoleBinding subjects; let it inherit from metadata
+- **Security context**: Always set runAsNonRoot, readOnlyRootFilesystem, drop ALL capabilities, seccompProfile RuntimeDefault
+- **Resource limits**: Set both requests and limits; CronJobs typically need less than Deployments
+- **Secret management**: Use stringData for templates, never commit real values; prefer external secret operators
+- **Config separation**: ConfigMap for non-sensitive settings, Secret for credentials
+- **Volume mounts**: Mount secrets read-only; use emptyDir for /tmp with readOnlyRootFilesystem
+- **Health checks**: Use exec probes with --version until HTTP endpoints implemented
+- **Job settings**: Set activeDeadlineSeconds for CronJobs to prevent runaway execution; use Forbid concurrencyPolicy
+- **Observability**: Include Prometheus annotations and optional ServiceMonitor/PodMonitor
+- **PodMonitor caveat**: CronJobs don't expose metrics endpoints by default; PodMonitor for future push-based metrics
+- **Examples**: Provide working examples for common patterns (monitoring, incident response)

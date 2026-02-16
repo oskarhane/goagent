@@ -367,3 +367,38 @@ Key Decisions:
 - .dockerignore removes README.md exception (not needed in image)
 
 Next Task: task-013
+================================================================================
+TASK-013: Create Kubernetes deployment manifests
+Date: 2026-02-16T21:30:00.000Z
+================================================================================
+
+Summary:
+Created comprehensive Kubernetes deployment manifests with service, CronJob, RBAC, and observability integration. Includes base manifests (deployment, cronjob, rbac), monitoring resources (ServiceMonitor, PodMonitor, OTel collector), working examples (monitoring-agent, incident-response), and detailed README. Applied review feedback: removed hardcoded namespace from RoleBinding subjects, added PodMonitor caveat about CronJob metrics.
+
+Files Changed:
+- deployments/k8s/base/deployment.yaml (created) - Deployment + Service with security context, resource limits, health probes, ConfigMap/Secret mounts
+- deployments/k8s/base/cronjob.yaml (created) - CronJob with activeDeadlineSeconds, concurrency policy, proper security context
+- deployments/k8s/base/rbac.yaml (created/modified) - ServiceAccount, Role, RoleBinding for namespace-scoped access; optional ClusterRole commented out; removed hardcoded namespace
+- deployments/k8s/base/configmap.yaml (created) - ConfigMap template for non-sensitive configuration
+- deployments/k8s/base/secret.yaml (created) - Secret template for credentials with stringData examples
+- deployments/k8s/monitoring/servicemonitor.yaml (created) - Prometheus Operator ServiceMonitor for HTTP metrics endpoint
+- deployments/k8s/monitoring/podmonitor.yaml (created/modified) - PodMonitor for CronJobs with caveat about future push-based metrics
+- deployments/k8s/monitoring/otel-collector.yaml (created) - OpenTelemetry Collector deployment with OTLP receivers
+- deployments/k8s/examples/monitoring-agent.yaml (created) - Complete monitoring agent example with K8s tool integration
+- deployments/k8s/examples/incident-response.yaml (created) - Incident response agent example with HTTP tool integration
+- deployments/k8s/README.md (created) - Comprehensive deployment guide with RBAC, troubleshooting, migration, observability setup
+- Makefile (modified) - Added k8s-apply, k8s-delete, k8s-status targets for Kubernetes operations
+
+Key Decisions:
+- Security-first: runAsNonRoot, readOnlyRootFilesystem, drop ALL capabilities, seccompProfile RuntimeDefault
+- Resource limits: Deployment (100m-1000m CPU, 128Mi-512Mi), CronJob (100m-500m CPU, 128Mi-256Mi)
+- RBAC: Namespace-scoped Role by default; ClusterRole commented for cross-namespace queries
+- Health checks: exec probes with --version command (HTTP endpoints not yet implemented)
+- Observability: ServiceMonitor for Deployments, PodMonitor for CronJobs, OTel collector for tracing
+- ConfigMap/Secret separation: Non-sensitive config in ConfigMap, credentials in Secret
+- Volume mounts: emptyDir for /tmp (read-only filesystem compatibility)
+- CronJob settings: activeDeadlineSeconds (600s), Forbid concurrency policy
+- Namespace handling: RoleBinding subjects inherit namespace from metadata (not hardcoded)
+- Examples: monitoring-agent (every 5min), incident-response (on-demand) show real-world patterns
+
+Next Task: task-014

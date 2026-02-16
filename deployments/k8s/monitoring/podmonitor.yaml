@@ -1,0 +1,22 @@
+# PodMonitor for Prometheus Operator
+# This requires the Prometheus Operator to be installed in your cluster
+# Use this for direct pod monitoring (useful for CronJobs)
+# NOTE: CronJob pods don't expose metrics endpoints by default - this is for future use
+# when push-based metrics (e.g., via OpenTelemetry) are implemented
+apiVersion: monitoring.coreos.com/v1
+kind: PodMonitor
+metadata:
+  name: goagent-cronjob
+  labels:
+    app: goagent
+    prometheus: kube-prometheus
+spec:
+  selector:
+    matchLabels:
+      app: goagent
+      component: cronjob
+  podMetricsEndpoints:
+  - port: http
+    path: /metrics
+    interval: 30s
+    scrapeTimeout: 10s
