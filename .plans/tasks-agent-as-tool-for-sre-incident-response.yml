@@ -158,3 +158,19 @@ tasks:
       - "DEBUG=true produces detailed logs"
       - "All acceptance criteria from PRD verified"
     completed_at: 2026-02-16T22:00:00.000Z
+
+  - id: task-011
+    title: "Verify example compiles and runs end-to-end"
+    description: |
+      Run full build and execution verification. Ensure go build succeeds, example runs with only OPENAI_API_KEY env var, completes within 60s, and produces expected output showing hierarchical delegation. Test with DEBUG=true for detailed logging. Update AGENTS.md with learnings.
+    status: completed
+    dependencies:
+    acceptance_criteria:
+      - "go build ./... succeeds without errors"
+      - "Example runs with only OPENAI_API_KEY set, in .env file"
+      - "Execution completes in <60 seconds"
+      - "Output clearly shows coordinator→investigator delegation"
+      - "DEBUG=true produces detailed logs"
+      - "All acceptance criteria from PRD verified"
+      - "Follow README to verify that the instructions are valid and correct"
+    completed_at: 2026-02-16T23:00:00.000Z

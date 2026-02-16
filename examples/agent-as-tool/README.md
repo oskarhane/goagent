@@ -89,19 +89,19 @@ go mod tidy
 **Default scenario (cascading failure):**
 
 ```bash
-go run main.go
+go run .
 ```
 
 **Custom incident description:**
 
 ```bash
-go run main.go "Cache service memory leak causing timeouts"
+go run . "Cache service memory leak causing timeouts"
 ```
 
 **Debug logging:**
 
 ```bash
-DEBUG=true go run main.go
+DEBUG=true go run .
 ```
 
 ## Example Output
