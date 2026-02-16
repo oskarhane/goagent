@@ -35,6 +35,7 @@
 - **API format mapping**: Role mapping (assistant→model, tool→function) and response format conversion critical for Vertex AI
 - **Vertex AI system messages**: Use systemInstruction field, not system role (Gemini doesn't support it)
 - **Tool call IDs**: Use crypto/rand for unique IDs; time.Now().UnixNano() can collide in parallel calls
+- **OpenAI token limits**: gpt-5+ models use max_completion_tokens instead of max_tokens; detect model version and use appropriate field
 
 ## Tool System
 
@@ -63,6 +64,7 @@
 - **Conversation history**: Pass previous Messages via RunOptions.History to maintain context across interactions
 - **History limiting**: Use MaxHistoryMessages to trim history from oldest messages when limit exceeded
 - **History serialization**: Messages serialize/deserialize to JSON cleanly for persistence (no custom marshaling needed)
+- **Tool message integrity**: When trimming history, preserve assistant+tool_calls with their corresponding tool messages to avoid API errors
 
 ## Logging and Tracing
 
@@ -136,3 +138,4 @@
 - **Shell tests**: Use safe commands only (echo, pwd, ls); avoid platform-specific behavior
 - **Flaky tests**: Skip timing-sensitive tests (context cancel) that can't be made deterministic
 - **Lint compliance**: Fix unused params with `_`, add missing imports, split long lines, use American spelling
+- **Complex algorithm tests**: Add dedicated unit tests for complex functions (like trimming with constraints); test edge cases thoroughly to prevent regression

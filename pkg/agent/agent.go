@@ -138,6 +138,126 @@ type RunResult struct {
 	Error error
 }
 
+// trimHistoryPreservingTools trims message history while ensuring tool_calls/tool message pairs
+// remain intact. If a tool message would be included, its corresponding assistant message with
+// tool_calls must also be included to avoid API errors.
+func trimHistoryPreservingTools(history []types.Message, maxMessages int) []types.Message {
+	if len(history) <= maxMessages {
+		return history
+	}
+
+	// Start from desired cutoff point
+	startIdx := len(history) - maxMessages
+
+	// Scan backward from cutoff to find a safe starting point
+	// We need to avoid starting with a tool message that has no corresponding tool_calls
+	for startIdx > 0 && startIdx < len(history) {
+		msg := history[startIdx]
+
+		// If we're starting with a tool message, we need to include the assistant message before it
+		if msg.Role == types.RoleTool {
+			// Find the assistant message with tool_calls that precedes this tool message
+			assistantFound := false
+			for i := startIdx - 1; i >= 0; i-- {
+				if history[i].Role == types.RoleAssistant && len(history[i].ToolCalls) > 0 {
+					// Check if this assistant message's tool calls match our tool message
+					for _, tc := range history[i].ToolCalls {
+						if tc.ID == msg.ToolCallID {
+							// Found the matching assistant message
+							// Now verify ALL its tool responses are included
+							toolCallIDs := make(map[string]bool)
+							for _, tc := range history[i].ToolCalls {
+								toolCallIDs[tc.ID] = true
+							}
+
+							allResponsesIncluded := true
+							for id := range toolCallIDs {
+								found := false
+								for j := i + 1; j < len(history); j++ {
+									if history[j].Role == types.RoleTool && history[j].ToolCallID == id {
+										found = true
+										break
+									}
+								}
+								if !found {
+									allResponsesIncluded = false
+									break
+								}
+							}
+
+							if allResponsesIncluded {
+								// Safe to start from the assistant message
+								startIdx = i
+								assistantFound = true
+							} else {
+								// Skip past the last tool response for this incomplete sequence
+								// Find the last tool message for this assistant
+								lastToolIdx := startIdx
+								for j := startIdx + 1; j < len(history); j++ {
+									if history[j].Role == types.RoleTool {
+										for _, tc := range history[i].ToolCalls {
+											if tc.ID == history[j].ToolCallID {
+												if j > lastToolIdx {
+													lastToolIdx = j
+												}
+												break
+											}
+										}
+									}
+								}
+								startIdx = lastToolIdx + 1
+							}
+							break
+						}
+					}
+					break
+				}
+			}
+			if assistantFound {
+				break
+			}
+			// If no valid assistant found, continue checking from new position
+			continue
+		}
+
+		// If starting with assistant message that has tool calls, check if all tool responses are included
+		if msg.Role == types.RoleAssistant && len(msg.ToolCalls) > 0 {
+			// Count how many tool responses follow
+			toolCallIDs := make(map[string]bool)
+			for _, tc := range msg.ToolCalls {
+				toolCallIDs[tc.ID] = true
+			}
+
+			// Check if all tool responses are in the remaining history
+			allResponsesIncluded := true
+			for id := range toolCallIDs {
+				found := false
+				for i := startIdx + 1; i < len(history); i++ {
+					if history[i].Role == types.RoleTool && history[i].ToolCallID == id {
+						found = true
+						break
+					}
+				}
+				if !found {
+					allResponsesIncluded = false
+					break
+				}
+			}
+
+			if !allResponsesIncluded {
+				// Skip this assistant message with tool_calls
+				startIdx++
+				continue
+			}
+		}
+
+		// This is a safe starting point
+		break
+	}
+
+	return history[startIdx:]
+}
+
 // Run executes the agent with the given prompt and options.
 // It performs reasoning → tool execution cycles until the task is complete
 // or limits are reached.
@@ -173,8 +293,8 @@ func (a *Agent) Run(ctx context.Context, prompt string, opts *RunOptions) *RunRe
 
 		// Apply history size limit if configured
 		if opts.MaxHistoryMessages > 0 && len(history) > opts.MaxHistoryMessages {
-			// Keep only the most recent messages by trimming from the start
-			history = history[len(history)-opts.MaxHistoryMessages:]
+			// Trim history while preserving tool_calls/tool message integrity
+			history = trimHistoryPreservingTools(history, opts.MaxHistoryMessages)
 			a.logger.Debug("conversation history trimmed", map[string]interface{}{
 				"original_count": len(opts.History),
 				"trimmed_count":  len(history),

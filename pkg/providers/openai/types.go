@@ -4,12 +4,13 @@ import "github.com/oskarhane/goagent/pkg/types"
 
 // openAIRequest matches the OpenAI Chat Completions API request format.
 type openAIRequest struct {
-	Model       string          `json:"model"`
-	Messages    []types.Message `json:"messages"`
-	Tools       []types.Tool    `json:"tools,omitempty"`
-	Temperature float64         `json:"temperature,omitempty"`
-	MaxTokens   int             `json:"max_tokens,omitempty"`
-	TopP        float64         `json:"top_p,omitempty"`
+	Model               string          `json:"model"`
+	Messages            []types.Message `json:"messages"`
+	Tools               []types.Tool    `json:"tools,omitempty"`
+	Temperature         float64         `json:"temperature,omitempty"`
+	MaxTokens           int             `json:"max_tokens,omitempty"`
+	MaxCompletionTokens int             `json:"max_completion_tokens,omitempty"`
+	TopP                float64         `json:"top_p,omitempty"`
 }
 
 // openAIResponse matches the OpenAI Chat Completions API response format.
@@ -42,14 +43,34 @@ type openAIErrorResponse struct {
 
 // convertToOpenAIRequest converts our standard CompletionRequest to OpenAI's format.
 func convertToOpenAIRequest(req *types.CompletionRequest) openAIRequest {
-	return openAIRequest{
+	oaiReq := openAIRequest{
 		Model:       req.Model,
 		Messages:    req.Messages,
 		Tools:       req.Tools,
 		Temperature: req.Temperature,
-		MaxTokens:   req.MaxTokens,
 		TopP:        req.TopP,
 	}
+
+	// Use max_completion_tokens for newer models (gpt-5+), max_tokens for older ones
+	if req.MaxTokens > 0 {
+		if isNewerModel(req.Model) {
+			oaiReq.MaxCompletionTokens = req.MaxTokens
+		} else {
+			oaiReq.MaxTokens = req.MaxTokens
+		}
+	}
+
+	return oaiReq
+}
+
+// isNewerModel returns true if the model uses max_completion_tokens instead of max_tokens.
+func isNewerModel(model string) bool {
+	// gpt-5+ models use max_completion_tokens
+	if len(model) >= 5 && model[:5] == "gpt-5" {
+		return true
+	}
+	// Add other newer model prefixes as needed
+	return false
 }
 
 // convertFromOpenAIResponse converts OpenAI's response to our standard format.

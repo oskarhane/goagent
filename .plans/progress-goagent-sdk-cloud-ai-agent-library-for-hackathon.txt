@@ -505,3 +505,27 @@ Key Decisions:
 - No functional changes, only string literal updates
 
 Next Task: All tasks complete
+
+================================================================================
+TASK-017: Fix broken examples
+Date: 2026-02-16T21:45:00.000Z
+================================================================================
+
+Summary:
+Fixed two critical issues preventing examples from running: OpenAI API parameter compatibility for gpt-5+ models and history trimming that broke tool message integrity. Added comprehensive unit tests for the complex trimHistoryPreservingTools function.
+
+Files Changed:
+- pkg/providers/openai/types.go (modified) - Added MaxCompletionTokens field and isNewerModel() function to handle gpt-5+ models that require max_completion_tokens instead of max_tokens
+- pkg/agent/agent.go (modified) - Fixed trimHistoryPreservingTools to properly handle incomplete tool call sequences and ensure tool messages aren't orphaned from their assistant messages
+- pkg/agent/agent_test.go (modified) - Added 8 comprehensive test cases for trimHistoryPreservingTools covering edge cases: history under/at limit, simple trimming, preserving tool calls, multiple tool responses, skipping incomplete sequences, empty history, and starting with tool messages
+- AGENTS.md (modified) - Added learnings: OpenAI token limits and tool message integrity for history trimming
+- README.md (modified) - Added note about .env loading alternatives
+
+Key Decisions:
+- OpenAI gpt-5+ detection via simple prefix check (sufficient for current/future models)
+- History trimming now validates ALL tool responses for an assistant's tool_calls are present before including
+- When starting with orphaned tool message, function finds parent assistant and validates completeness
+- Skip incomplete tool call sequences rather than risking API errors
+- Unit tests validate complex edge cases to prevent regression
+
+Next Task: All tasks complete

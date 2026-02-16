@@ -12,7 +12,7 @@ Get your first agent running in **under 5 minutes**:
 go get github.com/oskarhane/goagent
 ```
 
-### 2. Set up your environment (1 minute)
+### 2. Set up your environment and run (1 minute)
 
 Create a `.env` file with your API key:
 
@@ -23,6 +23,12 @@ OPENAI_API_KEY=sk-...
 # OR for Vertex AI
 GOOGLE_CLOUD_PROJECT=your-project-id
 GOOGLE_CLOUD_LOCATION=us-central1
+```
+
+Then run an example:
+
+```bash
+export $(cat .env | xargs) && go run ./examples/agent-basic
 ```
 
 ### 3. Create your first agent (3 minutes)

@@ -476,6 +476,141 @@ func TestAgent_RunResultTiming(t *testing.T) {
 	assert.True(t, result.ExecutionTime <= elapsed)
 }
 
+func TestTrimHistoryPreservingTools(t *testing.T) {
+	tests := []struct {
+		name        string
+		history     []types.Message
+		maxMessages int
+		wantLen     int
+		wantFirst   types.Role
+	}{
+		{
+			name: "history under limit",
+			history: []types.Message{
+				types.NewUserMessage("msg1"),
+				types.NewAssistantMessage("resp1"),
+			},
+			maxMessages: 5,
+			wantLen:     2,
+			wantFirst:   types.RoleUser,
+		},
+		{
+			name: "history at limit",
+			history: []types.Message{
+				types.NewUserMessage("msg1"),
+				types.NewAssistantMessage("resp1"),
+				types.NewUserMessage("msg2"),
+			},
+			maxMessages: 3,
+			wantLen:     3,
+			wantFirst:   types.RoleUser,
+		},
+		{
+			name: "trim simple messages no tools",
+			history: []types.Message{
+				types.NewUserMessage("msg1"),
+				types.NewAssistantMessage("resp1"),
+				types.NewUserMessage("msg2"),
+				types.NewAssistantMessage("resp2"),
+				types.NewUserMessage("msg3"),
+			},
+			maxMessages: 3,
+			wantLen:     3,
+			wantFirst:   types.RoleUser, // Should start at msg2
+		},
+		{
+			name: "preserve assistant with tool_calls and responses",
+			history: []types.Message{
+				types.NewUserMessage("msg1"),
+				{
+					Role: types.RoleAssistant,
+					ToolCalls: []types.ToolCall{
+						{ID: "call1", Type: "function", Function: types.FunctionCall{Name: "tool1"}},
+					},
+				},
+				{Role: types.RoleTool, ToolCallID: "call1", Content: "result1"},
+				types.NewUserMessage("msg2"),
+			},
+			maxMessages: 2, // Would cut off at msg2 and tool response
+			wantLen:     3, // But includes assistant with tool_calls
+			wantFirst:   types.RoleAssistant,
+		},
+		{
+			name: "preserve multiple tool responses",
+			history: []types.Message{
+				types.NewUserMessage("msg1"),
+				{
+					Role: types.RoleAssistant,
+					ToolCalls: []types.ToolCall{
+						{ID: "call1", Type: "function", Function: types.FunctionCall{Name: "tool1"}},
+						{ID: "call2", Type: "function", Function: types.FunctionCall{Name: "tool2"}},
+					},
+				},
+				{Role: types.RoleTool, ToolCallID: "call1", Content: "result1"},
+				{Role: types.RoleTool, ToolCallID: "call2", Content: "result2"},
+				types.NewUserMessage("msg2"),
+			},
+			maxMessages: 3, // Would cut at tool responses and msg2
+			wantLen:     4, // But must include assistant + both tool responses
+			wantFirst:   types.RoleAssistant,
+		},
+		{
+			name: "skip assistant with incomplete tool responses",
+			history: []types.Message{
+				types.NewUserMessage("msg1"),
+				{
+					Role: types.RoleAssistant,
+					ToolCalls: []types.ToolCall{
+						{ID: "call1", Type: "function", Function: types.FunctionCall{Name: "tool1"}},
+						{ID: "call2", Type: "function", Function: types.FunctionCall{Name: "tool2"}},
+					},
+				},
+				{Role: types.RoleTool, ToolCallID: "call1", Content: "result1"},
+				// call2 response missing
+				types.NewUserMessage("msg2"),
+				types.NewAssistantMessage("resp2"),
+			},
+			maxMessages: 3, // Would start at tool message (idx 2)
+			wantLen:     2, // Skips incomplete sequence, starts at msg2
+			wantFirst:   types.RoleUser,
+		},
+		{
+			name:        "empty history",
+			history:     []types.Message{},
+			maxMessages: 3,
+			wantLen:     0,
+			wantFirst:   "",
+		},
+		{
+			name: "starting with tool message includes assistant",
+			history: []types.Message{
+				types.NewUserMessage("msg1"),
+				{
+					Role: types.RoleAssistant,
+					ToolCalls: []types.ToolCall{
+						{ID: "call1", Type: "function", Function: types.FunctionCall{Name: "tool1"}},
+					},
+				},
+				{Role: types.RoleTool, ToolCallID: "call1", Content: "result1"},
+				types.NewUserMessage("msg2"),
+			},
+			maxMessages: 2, // Would start at tool message (idx 2)
+			wantLen:     3, // Must include assistant with tool_calls
+			wantFirst:   types.RoleAssistant,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result := trimHistoryPreservingTools(tt.history, tt.maxMessages)
+			assert.Equal(t, tt.wantLen, len(result), "unexpected result length")
+			if tt.wantLen > 0 {
+				assert.Equal(t, tt.wantFirst, result[0].Role, "unexpected first message role")
+			}
+		})
+	}
+}
+
 // Helper function
 func floatPtr(f float64) *float64 {
 	return &f

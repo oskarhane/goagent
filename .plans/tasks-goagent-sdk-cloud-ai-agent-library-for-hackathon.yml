@@ -251,3 +251,29 @@ tasks:
       - "Docs and README updated with the latest features and improvements"
       - "All examples tested and verified. If not fully working, provide detailed feedback"
     completed_at: 2026-02-16T14:28:35.000Z
+
+  - id: task-017
+    title: "Fix broken examples"
+    description: |
+      these commands exit with code 1:
+        - export $(cat .env | xargs) && go run ./examples/conversation-history
+          Error: |
+            Total messages in history: 25
+
+            Applying MaxHistoryMessages=10 limit...
+            Turn 6 (with limited history): What was the first calculation we did?
+            2026/02/16 14:45:11 Turn 6 failed: provider error at iteration 1: openai: Invalid parameter: messages with role 'tool' must be a response to a preceeding message with 'tool_calls'. (status: 400)
+            exit status 1
+        - export $(cat .env | xargs) && go run ./examples/openai-basic
+          Error: |
+            Created OpenAI provider: openai (default model: gpt-5.1)
+
+            Sending completion request...
+            2026/02/16 14:45:47 Completion failed: openai: Unsupported parameter: 'max_tokens' is not supported with this model. Use 'max_completion_tokens' instead. (status: 400)
+            exit status 1
+      The API key to open ai is provided in the .env file.
+    status: completed
+    dependencies:
+    acceptance_criteria:
+      - "the examples works as expected"
+    completed_at: 2026-02-16T21:45:00.000Z
