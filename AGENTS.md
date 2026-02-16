@@ -30,3 +30,7 @@
 - **.env support**: Document external .env loading (godotenv) rather than embedding it in provider
 - **Retryable errors**: 429, 500, 502, 503, 504 are retryable; use exponential backoff (2^n seconds)
 - **Context cancellation**: Check ctx.Err() after network failures and in retry loops
+- **Google Cloud auth**: Use oauth2.NewClient with TokenSource for ADC; simpler than custom transport
+- **API format mapping**: Role mapping (assistant→model, tool→function) and response format conversion critical for Vertex AI
+- **Vertex AI system messages**: Use systemInstruction field, not system role (Gemini doesn't support it)
+- **Tool call IDs**: Use crypto/rand for unique IDs; time.Now().UnixNano() can collide in parallel calls

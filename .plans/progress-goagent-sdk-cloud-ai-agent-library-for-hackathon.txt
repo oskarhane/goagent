@@ -74,3 +74,31 @@ Key Decisions:
 
 Next Task: task-004
 
+================================================================================
+TASK-004: Implement Vertex AI provider
+Date: 2026-02-16T11:46:48.000Z
+================================================================================
+
+Summary:
+Implemented complete Vertex AI provider matching OpenAI interface. Uses Google Cloud ADC for authentication, supports Gemini models, includes full tool calling support with API format mapping, exponential backoff retry, and comprehensive error handling. Applied review feedback: system messages now use systemInstruction field, tool call IDs use crypto/rand for uniqueness.
+
+Files Changed:
+- pkg/providers/vertex/vertex.go (created) - Provider implementation with ADC auth, retry logic, context cancellation
+- pkg/providers/vertex/types.go (created/modified) - Vertex AI API request/response types, bidirectional conversion, system message handling, secure tool call ID generation
+- pkg/providers/vertex/doc.go (created) - Package documentation with ADC setup and usage example
+- examples/vertex-basic/main.go (created) - Basic example showing provider usage with environment config
+- go.mod (modified) - Added golang.org/x/oauth2 dependency for Google Cloud authentication
+- AGENTS.md (modified) - Added Vertex AI specific learnings
+
+Key Decisions:
+- Use oauth2.NewClient with TokenSource for ADC (simpler than custom transport)
+- Role mapping: assistant→model, tool→function for Vertex AI compatibility
+- System messages extracted to systemInstruction field (Gemini doesn't support system role)
+- Tool call IDs generated with crypto/rand for true uniqueness (fallback to time-based)
+- Convert function call arguments between JSON string (our format) and map[string]any (Vertex format)
+- Tool results wrapped in map if content isn't already JSON
+- Default model: gemini-1.5-pro, location: us-central1
+- Unit tests deferred to task-015 per plan
+
+Next Task: task-005
+
