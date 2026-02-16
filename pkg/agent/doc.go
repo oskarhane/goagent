@@ -27,7 +27,7 @@
 // # Basic Usage
 //
 //	// Create provider and tools
-//	provider, _ := openai.NewProvider(openai.Config{
+//	provider, _ := openai.NewProvider(&openai.Config{
 //		APIKey: apiKey,
 //	})
 //
@@ -35,7 +35,7 @@
 //	// ... register tools ...
 //
 //	// Create agent
-//	agent, _ := agent.NewAgent(agent.Config{
+//	agent, _ := agent.NewAgent(&agent.Config{
 //		Provider: provider,
 //		Registry: registry,
 //	})
@@ -63,12 +63,37 @@
 //		History: result1.Messages,
 //	})
 //
+// # History Size Limiting
+//
+// To prevent context window overflow and control costs, limit history size:
+//
+//	result := agent.Run(ctx, "Continue our conversation", &agent.RunOptions{
+//		History:            previousMessages,
+//		MaxHistoryMessages: 20,  // Keep only last 20 messages
+//	})
+//
+// History can be serialized to JSON for storage and retrieval:
+//
+//	// Serialize history
+//	historyJSON, _ := json.Marshal(result.Messages)
+//	_ = os.WriteFile("history.json", historyJSON, 0644)
+//
+//	// Deserialize history
+//	var history []types.Message
+//	data, _ := os.ReadFile("history.json")
+//	_ = json.Unmarshal(data, &history)
+//
+//	// Use restored history
+//	result := agent.Run(ctx, "Resume our chat", &agent.RunOptions{
+//		History: history,
+//	})
+//
 // # Custom Configuration
 //
 // Agents can be customized with various options:
 //
 //	temp := 0.3
-//	agent, _ := agent.NewAgent(agent.Config{
+//	agent, _ := agent.NewAgent(&agent.Config{
 //		Provider:      provider,
 //		Registry:      registry,
 //		MaxIterations: 20,     // Allow more complex reasoning

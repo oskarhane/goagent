@@ -160,7 +160,7 @@ tasks:
     title: "Add conversation history support"
     description: |
       Implement conversation history feature allowing agents to maintain context across multiple interactions via WithHistory() option.
-    status: pending
+    status: completed
     dependencies:
       - task-006
     acceptance_criteria:
@@ -169,7 +169,7 @@ tasks:
       - "History serialization/deserialization working"
       - "Token usage tracked with history"
       - "History size limits configurable"
-    completed_at: null
+    completed_at: 2026-02-16T12:34:53.000Z
 
   - id: task-012
     title: "Create Docker deployment configuration"

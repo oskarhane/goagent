@@ -303,3 +303,32 @@ Key Decisions:
 - Review feedback: All acceptance criteria met with LGTM status
 
 Next Task: task-011
+
+================================================================================
+TASK-011: Add conversation history support
+Date: 2026-02-16T12:34:53.000Z
+================================================================================
+
+Summary:
+Implemented conversation history feature allowing agents to maintain context across multiple interactions. Added WithHistory() option accepting message slice, MaxHistoryMessages for limiting history size, and proper message prepending in agent loop. History serializes/deserializes cleanly via JSON for persistence.
+
+Files Changed:
+- pkg/agent/agent.go (modified) - Added History []types.Message and MaxHistoryMessages int to RunOptions, history prepending logic before tool results, trimming logic when limit exceeded
+- pkg/agent/doc.go (modified) - Documented new options and multi-interaction workflow
+- examples/conversation-history/main.go (created) - Complete example with multi-turn conversation and history management
+- examples/history-limiting-test/main.go (created) - Test suite validating history limiting logic (4 tests)
+- examples/history-serialization-test/main.go (created) - Test suite validating JSON serialization/deserialization integrity
+- AGENTS.md (modified) - Added conversation history learnings
+
+Key Decisions:
+- History prepended to messages slice before tool results (preserves conversation order)
+- Trim from oldest when MaxHistoryMessages exceeded (simple, predictable behavior)
+- WithHistory() accepts full message slice (no special handling for system messages)
+- Token tracking accumulates across iterations with history (RunResult.TotalTokens)
+- History serialization via standard json.Marshal/Unmarshal (no custom marshaling needed)
+- MaxHistoryMessages=0 means no limit (default behavior)
+- History trimming done after copying to avoid mutating caller's slice
+- Messages.History passed directly to provider (no filtering or modification)
+- Review fixes: corrected misleading comment about system message preservation, removed emojis from test output per AGENTS.md guidelines
+
+Next Task: task-012

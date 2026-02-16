@@ -104,6 +104,12 @@ type RunOptions struct {
 	// If provided, these messages are prepended to the current request.
 	History []types.Message
 
+	// MaxHistoryMessages limits the number of history messages to include.
+	// If > 0 and len(History) exceeds this limit, only the most recent
+	// messages are included (excluding system messages).
+	// If 0, all history is included. Default: 0 (unlimited).
+	MaxHistoryMessages int
+
 	// Model overrides the provider's default model.
 	Model string
 
@@ -163,9 +169,22 @@ func (a *Agent) Run(ctx context.Context, prompt string, opts *RunOptions) *RunRe
 	// Build message history
 	messages := []types.Message{types.NewSystemMessage(a.systemPrompt)}
 	if len(opts.History) > 0 {
-		messages = append(messages, opts.History...)
+		history := opts.History
+
+		// Apply history size limit if configured
+		if opts.MaxHistoryMessages > 0 && len(history) > opts.MaxHistoryMessages {
+			// Keep only the most recent messages by trimming from the start
+			history = history[len(history)-opts.MaxHistoryMessages:]
+			a.logger.Debug("conversation history trimmed", map[string]interface{}{
+				"original_count": len(opts.History),
+				"trimmed_count":  len(history),
+				"max_limit":      opts.MaxHistoryMessages,
+			})
+		}
+
+		messages = append(messages, history...)
 		a.logger.Debug("conversation history loaded", map[string]interface{}{
-			"history_messages": len(opts.History),
+			"history_messages": len(history),
 		})
 	}
 	messages = append(messages, types.NewUserMessage(prompt))
