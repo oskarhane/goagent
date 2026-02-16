@@ -24,7 +24,7 @@ func main() {
 	}
 
 	// Create Vertex AI provider
-	provider, err := vertex.NewProvider(vertex.Config{
+	provider, err := vertex.NewProvider(&vertex.Config{
 		ProjectID: projectID,
 		Location:  location,
 		Model:     "gemini-1.5-pro",

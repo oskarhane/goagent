@@ -21,7 +21,7 @@ func main() {
 	}
 
 	// Create provider
-	provider, err := openai.NewProvider(openai.Config{
+	provider, err := openai.NewProvider(&openai.Config{
 		APIKey: apiKey,
 	})
 	if err != nil {
@@ -55,7 +55,7 @@ func main() {
 	registry.MustRegister(shellTool, shellHandler)
 
 	// Create agent
-	a, err := agent.NewAgent(agent.Config{
+	a, err := agent.NewAgent(&agent.Config{
 		Provider: provider,
 		Registry: registry,
 	})

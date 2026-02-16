@@ -54,7 +54,7 @@ func main() {
 
 	// Try OpenAI provider
 	if apiKey := os.Getenv("OPENAI_API_KEY"); apiKey != "" {
-		provider, err := openai.NewProvider(openai.Config{
+		provider, err := openai.NewProvider(&openai.Config{
 			APIKey: apiKey,
 		})
 		if err != nil {
@@ -69,13 +69,13 @@ func main() {
 	// Try Vertex AI provider
 	if projectID := os.Getenv("GOOGLE_CLOUD_PROJECT"); projectID != "" {
 		// For this demo, we'll create the provider but won't call it without credentials
-		provider, err := vertex.NewProvider(vertex.Config{
+		provider, err := vertex.NewProvider(&vertex.Config{
 			ProjectID: projectID,
 			Location:  getEnvOrDefault("GOOGLE_CLOUD_LOCATION", "us-central1"),
 		})
 		if err != nil {
 			// If ADC is not configured, use a dummy client for demonstration
-			provider, err = vertex.NewProvider(vertex.Config{
+			provider, err = vertex.NewProvider(&vertex.Config{
 				ProjectID:  projectID,
 				HTTPClient: &http.Client{},
 			})

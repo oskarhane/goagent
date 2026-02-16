@@ -264,3 +264,42 @@ Key Decisions:
 - Large response sizes noted as future optimization opportunity
 
 Next Task: task-010
+
+================================================================================
+TASK-010: Implement structured logging and tracing
+Date: 2026-02-16T14:15:00.000Z
+================================================================================
+
+Summary:
+Implemented comprehensive structured logging with JSON output and optional OpenTelemetry tracing. Created Logger package with configurable log levels (debug, info, warn, error), integrated throughout Agent and Provider execution. Includes Noop logger for disabling output, span creation for major operations, and thread-safe log writes.
+
+Files Changed:
+- pkg/logger/logger.go (created) - Logger implementation with Level type, JSON output, OpenTelemetry integration, thread-safe writes with sync.Mutex
+- pkg/logger/doc.go (created) - Package documentation with usage examples
+- pkg/agent/agent.go (modified) - Updated NewAgent to accept *Config pointer, added logger integration throughout Run() method
+- pkg/providers/openai/openai.go (modified) - Updated NewProvider to accept *Config pointer, added logger integration in Complete() with span tracking
+- pkg/providers/vertex/vertex.go (modified) - Updated NewProvider to accept *Config pointer, added logger integration in Complete() with span tracking
+- examples/agent-basic/main.go (modified) - Updated for pointer-receiver Config API and logger initialization
+- examples/http-tool/main.go (modified) - Updated for pointer-receiver Config API and logger initialization
+- examples/k8s-tool/main.go (modified) - Updated for pointer-receiver Config API and logger initialization
+- examples/openai-basic/main.go (modified) - Updated for pointer-receiver Config API and logger initialization
+- examples/shell-tool/main.go (modified) - Updated for pointer-receiver Config API and logger initialization
+- examples/vertex-basic/main.go (modified) - Updated for pointer-receiver Config API and logger initialization
+- go.mod (modified) - Added go.opentelemetry.io/otel and go.opentelemetry.io/otel/trace dependencies
+- go.sum (modified) - Dependency checksums
+- AGENTS.md (modified) - Added logging and tracing learnings
+
+Key Decisions:
+- Use pointer receivers (*Config) for Agent/Provider configs per AGENTS.md guideline (structs >80 bytes)
+- Logger defaults to Noop if nil in configs (explicit opt-in)
+- Level comparison: LevelDebug=0 < LevelInfo=1 < LevelWarn=2 < LevelError=3 (lower value = more verbose)
+- OpenTelemetry tracing enabled via optional TracerName config string
+- Span creation uses defer pattern to capture errors on EndSpan
+- Thread-safe log writes using sync.Mutex (no concurrent write corruption)
+- JSON structured output with timestamp, level, message, fields
+- Logger integrated at: iteration starts, provider calls, tool executions, completions, errors
+- Noop logger sets Enabled=false to short-circuit all logging operations
+- Tool execution tracking in agent loop logs tool names and execution times
+- Review feedback: All acceptance criteria met with LGTM status
+
+Next Task: task-011

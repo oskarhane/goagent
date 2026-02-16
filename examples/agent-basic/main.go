@@ -22,7 +22,7 @@ func main() {
 	}
 
 	// Create provider
-	provider, err := openai.NewProvider(openai.Config{
+	provider, err := openai.NewProvider(&openai.Config{
 		APIKey: apiKey,
 	})
 	if err != nil {
@@ -127,7 +127,7 @@ func main() {
 
 	// Create agent
 	temperature := 0.7
-	agentInstance, err := agent.NewAgent(agent.Config{
+	agentInstance, err := agent.NewAgent(&agent.Config{
 		Provider:      provider,
 		Registry:      registry,
 		MaxIterations: 10,

@@ -11,9 +11,11 @@ import (
 	"net/http"
 	"time"
 
+	"go.opentelemetry.io/otel/attribute"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/google"
 
+	"github.com/oskarhane/goagent/pkg/logger"
 	"github.com/oskarhane/goagent/pkg/types"
 )
 
@@ -39,6 +41,7 @@ type Provider struct {
 	maxRetries int
 	timeout    time.Duration
 	client     *http.Client
+	logger     *logger.Logger
 }
 
 // Config contains configuration options for the Vertex AI provider.
@@ -60,10 +63,13 @@ type Config struct {
 
 	// HTTPClient allows injecting a custom HTTP client. If nil, one is created with ADC auth.
 	HTTPClient *http.Client
+
+	// Logger provides structured logging and tracing. If nil, defaults to Noop logger.
+	Logger *logger.Logger
 }
 
 // NewProvider creates a new Vertex AI provider with the given configuration.
-func NewProvider(cfg Config) (*Provider, error) {
+func NewProvider(cfg *Config) (*Provider, error) {
 	if cfg.ProjectID == "" {
 		return nil, fmt.Errorf("vertex: project ID is required")
 	}
@@ -101,6 +107,11 @@ func NewProvider(cfg Config) (*Provider, error) {
 		client.Timeout = time.Duration(timeout) * time.Second
 	}
 
+	log := cfg.Logger
+	if log == nil {
+		log = logger.Noop()
+	}
+
 	return &Provider{
 		projectID:  cfg.ProjectID,
 		location:   location,
@@ -108,6 +119,7 @@ func NewProvider(cfg Config) (*Provider, error) {
 		maxRetries: maxRetries,
 		timeout:    time.Duration(timeout) * time.Second,
 		client:     client,
+		logger:     log,
 	}, nil
 }
 
@@ -130,10 +142,34 @@ func (p *Provider) Complete(ctx context.Context, req *types.CompletionRequest) (
 	}
 
 	var lastErr error
+
+	// Start tracing span
+	ctx, span := p.logger.StartSpan(ctx, "vertex.complete",
+		attribute.String("model", reqCopy.Model),
+		attribute.Int("tools_count", len(reqCopy.Tools)),
+		attribute.String("project_id", p.projectID),
+		attribute.String("location", p.location),
+	)
+	defer func() {
+		p.logger.EndSpan(span, lastErr)
+	}()
+
+	p.logger.Debug("vertex ai completion request started", map[string]interface{}{
+		"model":       reqCopy.Model,
+		"tools_count": len(reqCopy.Tools),
+		"project_id":  p.projectID,
+		"location":    p.location,
+		"max_retries": p.maxRetries,
+	})
+
 	for attempt := 0; attempt <= p.maxRetries; attempt++ {
 		if attempt > 0 {
 			// Exponential backoff: 1s, 2s, 4s, 8s...
 			backoff := time.Duration(math.Pow(2, float64(attempt-1))) * time.Second
+			p.logger.Debug("retrying after backoff", map[string]interface{}{
+				"attempt":         attempt + 1,
+				"backoff_seconds": backoff.Seconds(),
+			})
 			select {
 			case <-ctx.Done():
 				return nil, ctx.Err()
@@ -143,6 +179,11 @@ func (p *Provider) Complete(ctx context.Context, req *types.CompletionRequest) (
 
 		resp, err := p.doRequest(ctx, &reqCopy)
 		if err == nil {
+			p.logger.Debug("vertex ai completion succeeded", map[string]interface{}{
+				"attempt":        attempt + 1,
+				"tokens_used":    resp.Usage.TotalTokens,
+				"has_tool_calls": resp.Message.HasToolCalls(),
+			})
 			return resp, nil
 		}
 
@@ -151,14 +192,32 @@ func (p *Provider) Complete(ctx context.Context, req *types.CompletionRequest) (
 		// Check if error is retryable
 		if provErr, ok := err.(*types.ProviderError); ok {
 			if !provErr.IsRetryable() {
+				p.logger.Warn("vertex ai non-retryable error", map[string]interface{}{
+					"attempt":     attempt + 1,
+					"error":       err.Error(),
+					"status_code": provErr.StatusCode,
+				})
 				return nil, err
 			}
+			p.logger.Warn("vertex ai retryable error", map[string]interface{}{
+				"attempt":     attempt + 1,
+				"error":       err.Error(),
+				"status_code": provErr.StatusCode,
+			})
 		} else {
 			// Unknown error, don't retry
+			p.logger.Error("vertex ai unknown error", map[string]interface{}{
+				"attempt": attempt + 1,
+				"error":   err.Error(),
+			})
 			return nil, err
 		}
 	}
 
+	p.logger.Error("vertex ai max retries exceeded", map[string]interface{}{
+		"max_retries": p.maxRetries,
+		"error":       lastErr.Error(),
+	})
 	return nil, lastErr
 }
 

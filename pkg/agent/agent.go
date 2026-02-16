@@ -7,6 +7,9 @@ import (
 	"fmt"
 	"time"
 
+	"go.opentelemetry.io/otel/attribute"
+
+	"github.com/oskarhane/goagent/pkg/logger"
 	"github.com/oskarhane/goagent/pkg/tools"
 	"github.com/oskarhane/goagent/pkg/types"
 )
@@ -28,6 +31,7 @@ type Agent struct {
 	maxIterations int
 	temperature   float64
 	systemPrompt  string
+	logger        *logger.Logger
 }
 
 // Config contains configuration for creating an agent.
@@ -48,10 +52,13 @@ type Config struct {
 	// SystemPrompt is the system-level instruction for the agent.
 	// If empty, a default prompt is used.
 	SystemPrompt string
+
+	// Logger provides structured logging and tracing. If nil, defaults to Noop logger.
+	Logger *logger.Logger
 }
 
 // NewAgent creates a new agent with the given configuration.
-func NewAgent(cfg Config) (*Agent, error) {
+func NewAgent(cfg *Config) (*Agent, error) {
 	if cfg.Provider == nil {
 		return nil, fmt.Errorf("agent: provider is required")
 	}
@@ -76,12 +83,18 @@ func NewAgent(cfg Config) (*Agent, error) {
 			"Provide clear, concise responses."
 	}
 
+	log := cfg.Logger
+	if log == nil {
+		log = logger.Noop()
+	}
+
 	return &Agent{
 		provider:      cfg.Provider,
 		registry:      cfg.Registry,
 		maxIterations: maxIterations,
 		temperature:   temperature,
 		systemPrompt:  systemPrompt,
+		logger:        log,
 	}, nil
 }
 
@@ -128,6 +141,20 @@ func (a *Agent) Run(ctx context.Context, prompt string, opts *RunOptions) *RunRe
 		Messages: []types.Message{},
 	}
 
+	// Start tracing span
+	ctx, span := a.logger.StartSpan(ctx, "agent.run",
+		attribute.String("prompt", prompt),
+		attribute.Int("max_iterations", a.maxIterations),
+	)
+	defer func() {
+		a.logger.EndSpan(span, result.Error)
+	}()
+
+	a.logger.Info("agent execution started", map[string]interface{}{
+		"max_iterations": a.maxIterations,
+		"temperature":    a.temperature,
+	})
+
 	// Initialize options
 	if opts == nil {
 		opts = &RunOptions{}
@@ -137,6 +164,9 @@ func (a *Agent) Run(ctx context.Context, prompt string, opts *RunOptions) *RunRe
 	messages := []types.Message{types.NewSystemMessage(a.systemPrompt)}
 	if len(opts.History) > 0 {
 		messages = append(messages, opts.History...)
+		a.logger.Debug("conversation history loaded", map[string]interface{}{
+			"history_messages": len(opts.History),
+		})
 	}
 	messages = append(messages, types.NewUserMessage(prompt))
 
@@ -144,11 +174,19 @@ func (a *Agent) Run(ctx context.Context, prompt string, opts *RunOptions) *RunRe
 	for iteration := 0; iteration < a.maxIterations; iteration++ {
 		result.Iterations = iteration + 1
 
+		a.logger.Debug("iteration started", map[string]interface{}{
+			"iteration": iteration + 1,
+		})
+
 		// Check context cancellation
 		select {
 		case <-ctx.Done():
 			result.Error = ctx.Err()
 			result.ExecutionTime = time.Since(start)
+			a.logger.Warn("agent execution canceled", map[string]interface{}{
+				"iteration": iteration + 1,
+				"error":     ctx.Err().Error(),
+			})
 			return result
 		default:
 		}
@@ -167,15 +205,32 @@ func (a *Agent) Run(ctx context.Context, prompt string, opts *RunOptions) *RunRe
 		}
 
 		// Call LLM provider
+		a.logger.Debug("calling provider", map[string]interface{}{
+			"iteration":   iteration + 1,
+			"model":       req.Model,
+			"temperature": req.Temperature,
+			"tools_count": len(req.Tools),
+		})
+
 		resp, err := a.provider.Complete(ctx, req)
 		if err != nil {
 			result.Error = fmt.Errorf("provider error at iteration %d: %w", iteration+1, err)
 			result.ExecutionTime = time.Since(start)
+			a.logger.Error("provider call failed", map[string]interface{}{
+				"iteration": iteration + 1,
+				"error":     err.Error(),
+			})
 			return result
 		}
 
 		// Track token usage
 		result.TotalTokens += resp.Usage.TotalTokens
+		a.logger.Debug("provider response received", map[string]interface{}{
+			"iteration":      iteration + 1,
+			"tokens_used":    resp.Usage.TotalTokens,
+			"total_tokens":   result.TotalTokens,
+			"has_tool_calls": resp.Message.HasToolCalls(),
+		})
 
 		// Add assistant response to messages
 		messages = append(messages, resp.Message)
@@ -185,15 +240,33 @@ func (a *Agent) Run(ctx context.Context, prompt string, opts *RunOptions) *RunRe
 			result.Response = resp.Message
 			result.Messages = messages
 			result.ExecutionTime = time.Since(start)
+			a.logger.Info("agent execution completed", map[string]interface{}{
+				"iterations":     iteration + 1,
+				"total_tokens":   result.TotalTokens,
+				"execution_time": result.ExecutionTime.Seconds(),
+			})
 			return result
 		}
 
 		// Execute tool calls
+		a.logger.Info("executing tool calls", map[string]interface{}{
+			"iteration":  iteration + 1,
+			"tool_count": len(resp.Message.ToolCalls),
+		})
+
 		toolResults := make([]types.ToolResult, 0, len(resp.Message.ToolCalls))
 		for _, call := range resp.Message.ToolCalls {
+			a.logger.Debug("executing tool", map[string]interface{}{
+				"tool_name": call.Function.Name,
+				"call_id":   call.ID,
+			})
+
 			// Validate tool parameters
 			tool, exists := a.registry.Get(call.Function.Name)
 			if !exists {
+				a.logger.Warn("tool not found", map[string]interface{}{
+					"tool_name": call.Function.Name,
+				})
 				toolResults = append(toolResults, types.ToolResult{
 					ToolCallID: call.ID,
 					ToolName:   call.Function.Name,
@@ -203,6 +276,10 @@ func (a *Agent) Run(ctx context.Context, prompt string, opts *RunOptions) *RunRe
 			}
 
 			if err := tools.ValidateParameters(tool, call); err != nil {
+				a.logger.Warn("tool parameter validation failed", map[string]interface{}{
+					"tool_name": call.Function.Name,
+					"error":     err.Error(),
+				})
 				toolResults = append(toolResults, types.ToolResult{
 					ToolCallID: call.ID,
 					ToolName:   call.Function.Name,
@@ -213,6 +290,18 @@ func (a *Agent) Run(ctx context.Context, prompt string, opts *RunOptions) *RunRe
 
 			// Execute tool
 			toolResult := a.registry.Execute(ctx, call)
+			if toolResult.Error != "" {
+				a.logger.Warn("tool execution failed", map[string]interface{}{
+					"tool_name":      call.Function.Name,
+					"error":          toolResult.Error,
+					"execution_time": toolResult.ExecutionTime.Seconds(),
+				})
+			} else {
+				a.logger.Debug("tool executed successfully", map[string]interface{}{
+					"tool_name":      call.Function.Name,
+					"execution_time": toolResult.ExecutionTime.Seconds(),
+				})
+			}
 			toolResults = append(toolResults, toolResult)
 		}
 
@@ -230,5 +319,10 @@ func (a *Agent) Run(ctx context.Context, prompt string, opts *RunOptions) *RunRe
 	result.Error = fmt.Errorf("maximum iterations (%d) reached without completion", a.maxIterations)
 	result.Messages = messages
 	result.ExecutionTime = time.Since(start)
+	a.logger.Warn("agent max iterations reached", map[string]interface{}{
+		"max_iterations": a.maxIterations,
+		"total_tokens":   result.TotalTokens,
+		"execution_time": result.ExecutionTime.Seconds(),
+	})
 	return result
 }

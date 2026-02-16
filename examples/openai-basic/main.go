@@ -19,7 +19,7 @@ func main() {
 	}
 
 	// Create OpenAI provider
-	provider, err := openai.NewProvider(openai.Config{
+	provider, err := openai.NewProvider(&openai.Config{
 		APIKey: apiKey,
 	})
 	if err != nil {
