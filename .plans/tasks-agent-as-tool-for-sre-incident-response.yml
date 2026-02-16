@@ -8,14 +8,14 @@ tasks:
     title: "Create agent-as-tool example directory structure"
     description: |
       Initialize examples/agent-as-tool/ with standard Go module structure. Create go.mod, go.sum, .env.example with OPENAI_API_KEY placeholder, and README.md skeleton. Follow patterns from examples/incident-response and examples/tools-basic.
-    status: pending
+    status: completed
     dependencies: []
     acceptance_criteria:
       - "Directory examples/agent-as-tool/ exists"
       - "go.mod with module name and dependencies created"
       - ".env.example contains OPENAI_API_KEY"
       - "README.md contains basic structure"
-    completed_at: null
+    completed_at: 2026-02-16T17:02:30.000Z
 
   - id: task-002
     title: "Implement mock tools for SRE diagnostics"

@@ -1,0 +1,19 @@
+================================================================================
+TASK-001: Create agent-as-tool example directory structure
+Date: 2026-02-16T17:02:30.000Z
+================================================================================
+
+Summary:
+Initialized examples/agent-as-tool/ directory with go.mod, .env.example, and comprehensive README.md documenting the agent-as-tool pattern for hierarchical SRE incident response.
+
+Files Changed:
+- examples/agent-as-tool/go.mod (created - module definition with replace directive)
+- examples/agent-as-tool/.env.example (created - OPENAI_API_KEY and DEBUG placeholders)
+- examples/agent-as-tool/README.md (created - architecture, quickstart, pattern explanation, code walkthrough skeleton)
+
+Key Decisions:
+- README includes comprehensive pattern explanation and when to use hierarchical agents vs single agent
+- Walkthrough section notes implementation coming in later tasks to avoid referencing non-existent files
+- go.sum will be generated when actual code packages are added in subsequent tasks
+
+Next Task: task-002

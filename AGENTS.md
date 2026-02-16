@@ -141,3 +141,8 @@
 - **Flaky tests**: Skip timing-sensitive tests (context cancel) that can't be made deterministic
 - **Lint compliance**: Fix unused params with `_`, add missing imports, split long lines, use American spelling
 - **Complex algorithm tests**: Add dedicated unit tests for complex functions (like trimming with constraints); test edge cases thoroughly to prevent regression
+
+## Examples
+
+- **Skeleton structure**: For multi-task examples, create directory structure + README skeleton first; note "implementation coming in later tasks" to avoid referencing non-existent files
+- **go.sum timing**: Don't generate go.sum until actual code/packages added; `go mod tidy` with no packages is expected to warn "matched no packages"
