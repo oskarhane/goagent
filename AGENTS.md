@@ -147,3 +147,4 @@
 - **Skeleton structure**: For multi-task examples, create directory structure + README skeleton first; note "implementation coming in later tasks" to avoid referencing non-existent files
 - **go.sum timing**: Don't generate go.sum until actual code/packages added; `go mod tidy` with no packages is expected to warn "matched no packages"
 - **Panic protection**: Add nil/empty checks in slice access methods (e.g., Default() returning slice[0]) even if factory guarantees population; defensive coding prevents runtime panics
+- **Agent factories**: Agent factory functions require provider param for initialization; extend spec signature if needed (e.g., NewInvestigator(service, provider, registry) vs spec's (service, registry))

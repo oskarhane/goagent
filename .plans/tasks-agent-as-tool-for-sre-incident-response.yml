@@ -51,7 +51,7 @@ tasks:
     title: "Implement investigator agent factory"
     description: |
       Create investigator.go with NewInvestigator() function that returns an agent configured for service-level investigation. Agent should have dynamic system prompt including service name, access to mock tools (logs, metrics, status), and max 5 iterations. Follow agent.NewAgent patterns from pkg/agent.
-    status: pending
+    status: completed
     dependencies:
       - task-002
     acceptance_criteria:
@@ -60,7 +60,7 @@ tasks:
       - "Agent configured with mock tools registry"
       - "Max iterations set to 5"
       - "Returns *agent.Agent and error"
-    completed_at: null
+    completed_at: 2026-02-16T18:00:00.000Z
 
   - id: task-005
     title: "Create agent-as-tool wrapper for investigator"

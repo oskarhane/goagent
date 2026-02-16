@@ -58,3 +58,25 @@ Key Decisions:
 - Mock data alignment test ensures scenarios and mocks use consistent service names
 
 Next Task: task-004
+================================================================================
+TASK-004: Implement investigator agent factory
+Date: 2026-02-16T18:00:00.000Z
+================================================================================
+
+Summary:
+Implemented NewInvestigator() factory function creating service-scoped investigation agents with dynamic system prompts, max 5 iterations, and tool registry integration. Function signature extended with provider parameter beyond spec for proper agent initialization.
+
+Files Changed:
+- examples/agent-as-tool/investigator.go (created - agent factory with service-specific system prompt)
+- examples/agent-as-tool/investigator_test.go (created - 5 tests covering validation, agent creation, error cases)
+- examples/agent-as-tool/go.mod (modified - OpenTelemetry indirect deps added by agent package)
+- examples/agent-as-tool/go.sum (modified - dependency checksums updated)
+
+Key Decisions:
+- Extended function signature to NewInvestigator(serviceName, provider, registry) - provider param required for agent initialization
+- System prompt includes service name 5x (title, intro, 3 methodology steps) for strong contextual grounding
+- Defensive checks for empty serviceName, nil provider, nil registry upfront
+- Max iterations hardcoded to 5 per spec
+- Test coverage includes error cases but can't verify internal agent state (acceptable for unit tests)
+
+Next Task: task-005
