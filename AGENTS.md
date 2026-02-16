@@ -10,7 +10,9 @@
 ## CI/CD
 
 - **Multi-version testing**: Test against N and N-1 Go versions for compatibility
-- **golangci-lint**: Configure via `.golangci.yml` for consistent linting
+- **golangci-lint**: Configure via `.golangci.yml` for consistent linting; use `colored-line-number` format (not deprecated `github-actions`)
+- **Go version alignment**: Ensure all CI jobs (test, lint, security) use same Go version as go.mod to avoid tooling incompatibilities
+- **Gosec scanner**: Use `securego/gosec@master` action (not `securecodewarrior/github-action-gosec` which doesn't exist)
 - **GoReleaser**: Set up early for proper version/ldflags injection
 
 ## Build System

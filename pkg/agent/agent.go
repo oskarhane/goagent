@@ -162,53 +162,54 @@ func trimHistoryPreservingTools(history []types.Message, maxMessages int) []type
 				if history[i].Role == types.RoleAssistant && len(history[i].ToolCalls) > 0 {
 					// Check if this assistant message's tool calls match our tool message
 					for _, tc := range history[i].ToolCalls {
-						if tc.ID == msg.ToolCallID {
-							// Found the matching assistant message
-							// Now verify ALL its tool responses are included
-							toolCallIDs := make(map[string]bool)
-							for _, tc := range history[i].ToolCalls {
-								toolCallIDs[tc.ID] = true
-							}
+						if tc.ID != msg.ToolCallID {
+							continue
+						}
+						// Found the matching assistant message
+						// Now verify ALL its tool responses are included
+						toolCallIDs := make(map[string]bool)
+						for _, tc := range history[i].ToolCalls {
+							toolCallIDs[tc.ID] = true
+						}
 
-							allResponsesIncluded := true
-							for id := range toolCallIDs {
-								found := false
-								for j := i + 1; j < len(history); j++ {
-									if history[j].Role == types.RoleTool && history[j].ToolCallID == id {
-										found = true
-										break
-									}
-								}
-								if !found {
-									allResponsesIncluded = false
+						allResponsesIncluded := true
+						for id := range toolCallIDs {
+							found := false
+							for j := i + 1; j < len(history); j++ {
+								if history[j].Role == types.RoleTool && history[j].ToolCallID == id {
+									found = true
 									break
 								}
 							}
+							if !found {
+								allResponsesIncluded = false
+								break
+							}
+						}
 
-							if allResponsesIncluded {
-								// Safe to start from the assistant message
-								startIdx = i
-								assistantFound = true
-							} else {
-								// Skip past the last tool response for this incomplete sequence
-								// Find the last tool message for this assistant
-								lastToolIdx := startIdx
-								for j := startIdx + 1; j < len(history); j++ {
-									if history[j].Role == types.RoleTool {
-										for _, tc := range history[i].ToolCalls {
-											if tc.ID == history[j].ToolCallID {
-												if j > lastToolIdx {
-													lastToolIdx = j
-												}
-												break
+						if allResponsesIncluded {
+							// Safe to start from the assistant message
+							startIdx = i
+							assistantFound = true
+						} else {
+							// Skip past the last tool response for this incomplete sequence
+							// Find the last tool message for this assistant
+							lastToolIdx := startIdx
+							for j := startIdx + 1; j < len(history); j++ {
+								if history[j].Role == types.RoleTool {
+									for _, tc := range history[i].ToolCalls {
+										if tc.ID == history[j].ToolCallID {
+											if j > lastToolIdx {
+												lastToolIdx = j
 											}
+											break
 										}
 									}
 								}
-								startIdx = lastToolIdx + 1
 							}
-							break
+							startIdx = lastToolIdx + 1
 						}
+						break
 					}
 					break
 				}

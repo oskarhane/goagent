@@ -529,3 +529,23 @@ Key Decisions:
 - Unit tests validate complex edge cases to prevent regression
 
 Next Task: All tasks complete
+================================================================================
+TASK-018: Fix CI issues
+Date: 2026-02-16T17:45:00.000Z
+================================================================================
+
+Summary:
+Fixed GitHub Actions CI failures: golangci-lint version mismatch and missing gosec action. Updated Go version to 1.25 across all CI jobs and test matrix, fixed deprecated output format, and corrected gosec action reference.
+
+Files Changed:
+- .github/workflows/ci.yml (modified) - Changed lint/security jobs from Go 1.26 to 1.25, updated test matrix to ['1.25', '1.24'] following N and N-1 pattern, added --out-format=colored-line-number replacing deprecated github-actions format, fixed gosec action to securego/gosec@master
+- .github/workflows/release.yml (modified) - Changed Go version from 1.26 to 1.25 for alignment with go.mod
+- AGENTS.md (modified) - Added CI/CD learnings: Go version alignment, golangci-lint configuration, gosec scanner action
+
+Key Decisions:
+- Test against Go 1.25 (N) and 1.24 (N-1) per AGENTS.md guidelines
+- Use securego/gosec@master (official action) not securecodewarrior/github-action-gosec (doesn't exist)
+- Use colored-line-number output format (github-actions deprecated)
+- Align all CI jobs to go.mod version 1.25
+
+Next Task: All tasks complete

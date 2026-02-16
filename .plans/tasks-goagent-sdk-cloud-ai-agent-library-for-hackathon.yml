@@ -277,3 +277,34 @@ tasks:
     acceptance_criteria:
       - "the examples works as expected"
     completed_at: 2026-02-16T21:45:00.000Z
+
+  - id: task-018
+    title: "Fix CI issues"
+    description: |
+      Some errors from GitHub Actions:
+        ---
+        Run golangci/golangci-lint-action@v4
+        prepare environment
+        run golangci-lint
+          Running [/home/runner/golangci-lint-1.64.8-linux-amd64/golangci-lint run --out-format=github-actions --timeout=5m] in [] ...
+          level=warning msg="[config_reader] The output format `github-actions` is deprecated, please use `colored-line-number`"
+          Error: can't load config: the Go language version (go1.24) used to build golangci-lint is lower than the targeted Go version (1.25.0)
+          Failed executing command with error: can't load config: the Go language version (go1.24) used to build golangci-lint is lower than the targeted Go version (1.25.0)
+
+          Error: golangci-lint exit with code 3
+        ---
+          Current runner version: '2.331.0'
+          Runner Image Provisioner
+          Operating System
+          Runner Image
+          GITHUB_TOKEN Permissions
+          Secret source: Actions
+          Prepare workflow directory
+          Prepare all required actions
+          Getting action download info
+          Error: Unable to resolve action securecodewarrior/github-action-gosec, repository not found
+    status: completed
+    dependencies:
+    acceptance_criteria:
+      - "the tests, linting, and security checks pass on GitHub Actions"
+    completed_at: 2026-02-16T17:45:00.000Z
