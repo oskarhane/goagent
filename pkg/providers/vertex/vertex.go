@@ -21,7 +21,7 @@ import (
 
 const (
 	// DefaultModel is the default Gemini model used if none is specified.
-	DefaultModel = "gemini-1.5-pro"
+	DefaultModel = "gemini-2.5-pro"
 
 	// DefaultMaxRetries is the default number of retry attempts.
 	DefaultMaxRetries = 3

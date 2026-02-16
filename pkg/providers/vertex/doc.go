@@ -30,7 +30,7 @@
 //	}
 //
 //	resp, err := provider.Complete(ctx, &types.CompletionRequest{
-//	    Model: "gemini-1.5-pro",
+//	    Model: "gemini-2.5-pro",
 //	    Messages: []types.Message{
 //	        types.NewUserMessage("What is the weather like?"),
 //	    },

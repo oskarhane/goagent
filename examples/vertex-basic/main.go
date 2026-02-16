@@ -27,7 +27,7 @@ func main() {
 	provider, err := vertex.NewProvider(&vertex.Config{
 		ProjectID: projectID,
 		Location:  location,
-		Model:     "gemini-1.5-pro",
+		Model:     "gemini-2.5-pro",
 	})
 	if err != nil {
 		log.Fatalf("Failed to create provider: %v", err)

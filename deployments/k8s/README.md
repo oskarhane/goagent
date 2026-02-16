@@ -118,8 +118,8 @@ data:
   log_level: "info"          # debug, info, warn, error
   max_iterations: "10"       # Maximum agent reasoning loops
   timeout: "300"             # Timeout in seconds
-  openai_model: "gpt-4-turbo-preview"
-  vertex_model: "gemini-1.5-pro"
+  openai_model: "gpt-5.1"
+  vertex_model: "gemini-2.5-pro"
 ```
 
 Apply changes:

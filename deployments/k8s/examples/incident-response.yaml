@@ -39,7 +39,7 @@ spec:
               name: goagent-secrets
               key: openai_api_key
         - name: OPENAI_MODEL
-          value: "gpt-4-turbo-preview"
+          value: "gpt-5.1"
         ports:
         - name: http
           containerPort: 8080

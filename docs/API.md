@@ -45,7 +45,7 @@ result := a.Run(ctx, "Your task here", nil)
 
 // With options
 result := a.Run(ctx, "Your task", &agent.RunOptions{
-    Model:             "gpt-4",          // Override provider model
+    Model:             "gpt-5",          // Override provider model
     MaxTokens:         2000,             // Limit response tokens
     History:           previousMessages, // Conversation context
     MaxHistoryMessages: 10,              // Trim old messages
@@ -84,16 +84,16 @@ import "github.com/oskarhane/goagent/pkg/providers/openai"
 
 provider, err := openai.NewProvider(&openai.Config{
     APIKey:     os.Getenv("OPENAI_API_KEY"), // Required
-    Model:      "gpt-4-turbo-preview",       // Optional (default)
+    Model:      "gpt-5.1",                   // Optional (default)
     MaxRetries: 3,                            // Optional (default: 3)
     BaseURL:    "https://api.openai.com/v1", // Optional
 })
 ```
 
 **Supported Models:**
-- `gpt-4-turbo-preview` (default)
-- `gpt-4`
-- `gpt-3.5-turbo`
+- `gpt-5.1` (default)
+- `gpt-5-mini`
+- `gpt-5`
 
 **Environment Variables:**
 - `OPENAI_API_KEY` - Your OpenAI API key
@@ -111,15 +111,16 @@ import "github.com/oskarhane/goagent/pkg/providers/vertex"
 provider, err := vertex.NewProvider(&vertex.Config{
     ProjectID:  os.Getenv("GOOGLE_CLOUD_PROJECT"),  // Required
     Location:   "us-central1",                       // Required
-    Model:      "gemini-1.5-pro",                    // Optional (default)
+    Model:      "gemini-2.5-pro",                    // Optional (default)
     MaxRetries: 3,                                   // Optional (default: 3)
 })
 ```
 
 **Supported Models:**
-- `gemini-1.5-pro` (default)
-- `gemini-pro`
-- `gemini-pro-vision`
+- `gemini-2.5-pro` (default)
+- `gemini-3-flash-preview`
+- `gemini-2.5-flash`
+- `gemini-flash-latest`
 
 **Authentication:**
 Uses Google Cloud Application Default Credentials (ADC):

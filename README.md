@@ -113,21 +113,21 @@ go run main.go
 
 Providers are LLM backends. GoAgent supports:
 
-- **OpenAI**: GPT-4, GPT-3.5-turbo
-- **Vertex AI**: Gemini Pro, Gemini Pro Vision
+- **OpenAI**: gpt-5.1, gpt-5-mini, gpt-5
+- **Vertex AI**: gemini-2.5-pro, gemini-3-flash-preview, gemini-2.5-flash, gemini-flash-latest
 
 ```go
 // OpenAI
 provider, _ := openai.NewProvider(&openai.Config{
     APIKey: os.Getenv("OPENAI_API_KEY"),
-    Model:  "gpt-4-turbo-preview",
+    Model:  "gpt-5.1",
 })
 
 // Vertex AI
 provider, _ := vertex.NewProvider(&vertex.Config{
     ProjectID: os.Getenv("GOOGLE_CLOUD_PROJECT"),
     Location:  os.Getenv("GOOGLE_CLOUD_LOCATION"),
-    Model:     "gemini-1.5-pro",
+    Model:     "gemini-2.5-pro",
 })
 ```
 

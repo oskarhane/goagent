@@ -13,10 +13,10 @@ data:
   timeout: "300"
   
   # OpenAI provider defaults (if not set in secrets)
-  openai_model: "gpt-4-turbo-preview"
+  openai_model: "gpt-5.1"
   
   # Vertex AI provider defaults (if not set in secrets)
-  vertex_model: "gemini-1.5-pro"
+  vertex_model: "gemini-2.5-pro"
   vertex_location: "us-central1"
   
   # Tool configuration

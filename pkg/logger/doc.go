@@ -8,7 +8,7 @@
 //	logger := logger.Default()
 //	logger.Info("agent started", map[string]interface{}{
 //		"provider": "openai",
-//		"model": "gpt-4",
+//		"model": "gpt-5.1",
 //	})
 //
 // # Log Levels

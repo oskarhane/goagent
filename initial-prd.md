@@ -85,8 +85,8 @@ provider := vertex.New(vertex.Config{
 **Supported Providers:**
 | Provider | Models | Auth |
 |----------|--------|------|
-| OpenAI | gpt-4o, gpt-4o-mini | API Key |
-| Vertex AI | gemini-2.0-flash, gemini-2.0-pro | Application Default Credentials / Service Account |
+| OpenAI | gpt-5.1, gpt-5-mini, gpt-5 | API Key |
+| Vertex AI | gemini-2.5-pro, gemini-3-flash-preview, gemini-2.5-flash, gemini-flash-latest | Application Default Credentials / Service Account |
 
 ### 5.2 Tools
 
@@ -558,7 +558,7 @@ func main() {
 
     // Initialize LLM provider
     provider := openai.New(os.Getenv("OPENAI_API_KEY"),
-        openai.WithModel("gpt-4o"),
+        openai.WithModel("gpt-5.1"),
     )
 
     // Define tools
@@ -738,7 +738,7 @@ goagent/
 ```go
 // ===== PROVIDER SETUP =====
 provider := openai.New(apiKey)
-provider := openai.New(apiKey, openai.WithModel("gpt-4o-mini"))
+provider := openai.New(apiKey, openai.WithModel("gpt-5-mini"))
 provider := vertex.New(vertex.Config{ProjectID: "x", Location: "us-central1"})
 
 // ===== TOOL DEFINITION =====

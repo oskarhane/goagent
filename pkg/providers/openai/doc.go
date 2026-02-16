@@ -24,7 +24,7 @@
 //	}
 //
 //	resp, err := provider.Complete(ctx, &types.CompletionRequest{
-//	    Model: "gpt-4-turbo-preview",
+//	    Model: "gpt-5.1",
 //	    Messages: []types.Message{
 //	        types.NewUserMessage("What is the weather like?"),
 //	    },

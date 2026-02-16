@@ -38,7 +38,7 @@ func main() {
     provider, err := vertex.NewProvider(vertex.Config{
         ProjectID: "my-gcp-project",
         Location:  "us-central1",     // Optional, defaults to us-central1
-        Model:     "gemini-1.5-pro",  // Optional, defaults to gemini-1.5-pro
+        Model:     "gemini-2.5-pro",  // Optional, defaults to gemini-2.5-pro
     })
     if err != nil {
         log.Fatal(err)
@@ -69,16 +69,17 @@ func main() {
 
 - `ProjectID` (required): Your Google Cloud project ID
 - `Location` (optional): GCP region, defaults to "us-central1"
-- `Model` (optional): Model to use, defaults to "gemini-1.5-pro"
+- `Model` (optional): Model to use, defaults to "gemini-2.5-pro"
 - `MaxRetries` (optional): Number of retry attempts, defaults to 3
 - `Timeout` (optional): Request timeout in seconds, defaults to 60
 - `HTTPClient` (optional): Custom HTTP client (useful for testing)
 
 ## Supported Models
 
-- `gemini-1.5-pro` (default)
-- `gemini-1.5-flash`
-- `gemini-pro`
+- `gemini-2.5-pro` (default)
+- `gemini-3-flash-preview`
+- `gemini-2.5-flash`
+- `gemini-flash-latest`
 - Other Gemini models available in your region
 
 ## API Compatibility

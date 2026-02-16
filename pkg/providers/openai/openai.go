@@ -22,7 +22,7 @@ const (
 	DefaultBaseURL = "https://api.openai.com/v1"
 
 	// DefaultModel is the default model used if none is specified.
-	DefaultModel = "gpt-4-turbo-preview"
+	DefaultModel = "gpt-5.1"
 
 	// DefaultMaxRetries is the default number of retry attempts.
 	DefaultMaxRetries = 3

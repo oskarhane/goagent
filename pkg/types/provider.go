@@ -33,7 +33,7 @@ type Provider interface {
 
 	// DefaultModel returns the default model identifier for this provider.
 	// This is used when no model is explicitly specified in the request.
-	// Examples: "gpt-4-turbo-preview", "gemini-pro", "claude-3-opus"
+	// Examples: "gpt-5.1", "gemini-2.5-pro", "claude-3-opus"
 	DefaultModel() string
 }
 

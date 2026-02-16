@@ -46,7 +46,7 @@ func TestNewProvider(t *testing.T) {
 			name: "custom model",
 			config: &Config{
 				APIKey: "test-key",
-				Model:  "gpt-3.5-turbo",
+				Model:  "gpt-5-mini",
 			},
 			wantErr: false,
 		},
@@ -92,7 +92,7 @@ func TestProvider_Complete_Success(t *testing.T) {
 			"id":      "chatcmpl-123",
 			"object":  "chat.completion",
 			"created": 1677652288,
-			"model":   "gpt-4-turbo-preview",
+			"model":   "gpt-5.1",
 			"choices": []map[string]any{
 				{
 					"index": 0,
@@ -148,7 +148,7 @@ func TestProvider_Complete_WithToolCalls(t *testing.T) {
 			"id":      "chatcmpl-123",
 			"object":  "chat.completion",
 			"created": 1677652288,
-			"model":   "gpt-4-turbo-preview",
+			"model":   "gpt-5.1",
 			"choices": []map[string]any{
 				{
 					"index": 0,
@@ -219,7 +219,7 @@ func TestProvider_Complete_RetryOnError(t *testing.T) {
 			"id":      "chatcmpl-123",
 			"object":  "chat.completion",
 			"created": 1677652288,
-			"model":   "gpt-4-turbo-preview",
+			"model":   "gpt-5.1",
 			"choices": []map[string]any{
 				{
 					"index": 0,

@@ -47,7 +47,7 @@ func TestNewProvider(t *testing.T) {
 			name: "custom model",
 			config: &Config{
 				ProjectID:  "test-project",
-				Model:      "gemini-1.5-flash",
+				Model:      "gemini-2.5-flash",
 				HTTPClient: &http.Client{},
 			},
 			wantErr: false,

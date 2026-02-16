@@ -97,13 +97,13 @@ Create a `.env` file in the `deployments/docker` directory:
 ```bash
 # OpenAI Configuration
 OPENAI_API_KEY=sk-...
-OPENAI_MODEL=gpt-4-turbo-preview
+OPENAI_MODEL=gpt-5.1
 
 # Vertex AI Configuration
 GOOGLE_CLOUD_PROJECT=your-project-id
 GOOGLE_CREDENTIALS_PATH=./credentials/key.json
 VERTEX_LOCATION=us-central1
-VERTEX_MODEL=gemini-1.5-pro
+VERTEX_MODEL=gemini-2.5-pro
 
 # Agent Configuration
 LOG_LEVEL=info
@@ -122,11 +122,11 @@ OTEL_EXPORTER_OTLP_ENDPOINT=http://jaeger:4318
 | Variable | Description | Default | Required |
 |----------|-------------|---------|----------|
 | `OPENAI_API_KEY` | OpenAI API key | - | For OpenAI |
-| `OPENAI_MODEL` | OpenAI model name | `gpt-4-turbo-preview` | No |
+| `OPENAI_MODEL` | OpenAI model name | `gpt-5.1` | No |
 | `GOOGLE_CLOUD_PROJECT` | GCP project ID | - | For Vertex AI |
 | `GOOGLE_APPLICATION_CREDENTIALS` | Path to service account key | - | For Vertex AI |
 | `VERTEX_LOCATION` | Vertex AI location | `us-central1` | No |
-| `VERTEX_MODEL` | Vertex AI model name | `gemini-1.5-pro` | No |
+| `VERTEX_MODEL` | Vertex AI model name | `gemini-2.5-pro` | No |
 
 ### Agent Configuration
 

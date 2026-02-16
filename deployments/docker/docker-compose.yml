@@ -13,7 +13,7 @@ services:
     environment:
       # OpenAI Configuration
       - OPENAI_API_KEY=${OPENAI_API_KEY}
-      - OPENAI_MODEL=${OPENAI_MODEL:-gpt-4-turbo-preview}
+      - OPENAI_MODEL=${OPENAI_MODEL:-gpt-5.1}
       
       # Agent Configuration
       - LOG_LEVEL=${LOG_LEVEL:-info}
@@ -54,7 +54,7 @@ services:
       - GOOGLE_CLOUD_PROJECT=${GOOGLE_CLOUD_PROJECT}
       - GOOGLE_APPLICATION_CREDENTIALS=${GOOGLE_APPLICATION_CREDENTIALS:-/app/credentials/gcloud-key.json}
       - VERTEX_LOCATION=${VERTEX_LOCATION:-us-central1}
-      - VERTEX_MODEL=${VERTEX_MODEL:-gemini-1.5-pro}
+      - VERTEX_MODEL=${VERTEX_MODEL:-gemini-2.5-pro}
       
       # Agent Configuration
       - LOG_LEVEL=${LOG_LEVEL:-info}

@@ -91,7 +91,7 @@ type FunctionDefinition struct {
 // CompletionRequest represents a request to an LLM provider for text generation.
 // It abstracts the differences between provider APIs into a unified interface.
 type CompletionRequest struct {
-	// Model specifies which model to use (e.g., "gpt-4", "gemini-pro").
+	// Model specifies which model to use (e.g., "gpt-5.1", "gemini-2.5-pro").
 	Model string `json:"model"`
 
 	// Messages contains the conversation history and current prompt.

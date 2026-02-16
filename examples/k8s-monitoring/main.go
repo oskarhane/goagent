@@ -28,7 +28,7 @@ func main() {
 	// Create provider
 	provider, err := openai.NewProvider(&openai.Config{
 		APIKey: apiKey,
-		Model:  "gpt-4-turbo-preview",
+		Model:  "gpt-5.1",
 	})
 	if err != nil {
 		log.Fatalf("Failed to create provider: %v", err)
