@@ -17,3 +17,24 @@ Key Decisions:
 - go.sum will be generated when actual code packages are added in subsequent tasks
 
 Next Task: task-002
+================================================================================
+TASK-002: Implement mock tools for SRE diagnostics
+Date: 2026-02-16T17:30:00.000Z
+================================================================================
+
+Summary:
+Implemented three mock tools (mock_logs, mock_metrics, mock_service_status) for simulating SRE diagnostics data. Created comprehensive test suite covering tool definitions, handlers, determinism, and cascading failure scenarios.
+
+Files Changed:
+- examples/agent-as-tool/mocks.go (created - mock tool implementations with realistic data generators)
+- examples/agent-as-tool/mocks_test.go (created - 5 tests covering tool behavior and determinism)
+- examples/agent-as-tool/go.mod (modified - updated to Go 1.26 aligning with main go.mod)
+- examples/agent-as-tool/go.sum (created - dependency checksums generated)
+
+Key Decisions:
+- Used Builder pattern for all tool definitions following framework conventions
+- Timestamps relative to time.Now() for realistic but structurally deterministic data
+- Implemented cascading failure simulation (database→auth-service→api-service) for demo
+- Context parameter captured but not checked in handlers (acceptable for lightweight mocks)
+
+Next Task: task-003

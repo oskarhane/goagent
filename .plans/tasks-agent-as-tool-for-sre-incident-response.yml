@@ -21,7 +21,7 @@ tasks:
     title: "Implement mock tools for SRE diagnostics"
     description: |
       Create mocks.go with three mock tool implementations: mock_logs (returns simulated log entries), mock_metrics (returns time-series data), and mock_service_status (returns health check results). Tools must be scoped by service name parameter and return realistic, deterministic data for demo purposes.
-    status: pending
+    status: completed
     dependencies:
       - task-001
     acceptance_criteria:
@@ -30,7 +30,7 @@ tasks:
       - "mock_service_status returns health check JSON"
       - "All tools use tools.Builder pattern"
       - "Data is deterministic for reproducible demos"
-    completed_at: null
+    completed_at: 2026-02-16T17:30:00.000Z
 
   - id: task-003
     title: "Create incident scenarios with cascading failures"

@@ -3,7 +3,7 @@
 ## Go Project Setup
 
 - **Version injection**: Use `var version = "dev"` not `const` for ldflags compatibility
-- **Go version**: Use Go 1.25 for broader CI compatibility vs latest 1.26
+- **Go version**: Align examples with main go.mod version (currently 1.26); consistency more important than version choice
 - **Empty dirs**: Git won't track empty directories; use `.gitkeep` or remove them
 - **godoc**: No need for docs/ dir; use `make docs` to serve on-demand
 
