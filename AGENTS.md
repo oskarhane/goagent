@@ -154,3 +154,4 @@
 - **Test helpers**: Extract shared mocks (e.g., mockProvider) to test_helpers.go when used by multiple test files; avoids duplication while maintaining isolation
 - **Context timeout**: Add explicit timeout (context.WithTimeout) for example main() execution to prevent runaway LLM interactions; defensive coding even when LLM providers have their own timeouts
 - **Binary artifacts**: Add example binaries to .gitignore immediately when creating new examples; prevents accidental commits
+- **Agent-as-tool pattern**: Wrap inner agents as tools for hierarchical delegation; handler creates agent, runs with context, returns result as ToolResult; enables coordinator→specialist architecture for complex workflows

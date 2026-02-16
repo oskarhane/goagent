@@ -29,10 +29,10 @@ func main() {
 		log.Fatal("OPENAI_API_KEY environment variable is required")
 	}
 
-	// Create OpenAI provider with gpt-5.1 for complex reasoning
+	// Create OpenAI provider with gpt-4-turbo for complex reasoning
 	provider, err := openai.NewProvider(&openai.Config{
 		APIKey: apiKey,
-		Model:  "gpt-5.1",
+		Model:  "gpt-4-turbo",
 	})
 	if err != nil {
 		log.Fatalf("Failed to create OpenAI provider: %v", err)
