@@ -111,8 +111,8 @@ Be systematic and thorough. Provide a clear incident summary with:
 		incident = defaultScenario.GetIncidentDescription()
 	}
 
-	// Run coordinator agent with 60s timeout to prevent runaway execution
-	ctx, cancel := context.WithTimeout(context.Background(), 60*time.Second)
+	// Run coordinator agent with 5 minute timeout for complex investigations
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Minute)
 	defer cancel()
 
 	fmt.Println("=== Agent-as-Tool: Hierarchical SRE Investigation ===")
