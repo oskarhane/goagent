@@ -130,7 +130,7 @@ tasks:
     title: "Create built-in Kubernetes query tool"
     description: |
       Implement Kubernetes client integration for querying cluster resources. Include RBAC-safe operations and common resource queries (pods, services, deployments).
-    status: pending
+    status: completed
     dependencies:
       - task-005
     acceptance_criteria:
@@ -139,7 +139,7 @@ tasks:
       - "RBAC permissions respected"
       - "Namespace scoping supported"
       - "Error handling for cluster connection issues"
-    completed_at: null
+    completed_at: 2026-02-16T13:45:00.000Z
 
   - id: task-010
     title: "Implement structured logging and tracing"

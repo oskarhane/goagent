@@ -233,3 +233,34 @@ Key Decisions:
 - Review fixes: removed redundant newline in Println, fixed workingDir→working_dir JSON key
 
 Next Task: task-009
+
+================================================================================
+TASK-009: Create built-in Kubernetes query tool
+Date: 2026-02-16T13:45:00.000Z
+================================================================================
+
+Summary:
+Implemented Kubernetes client integration for querying cluster resources. Supports common resource queries (pods, services, deployments, configmaps, secrets, namespaces, nodes) with namespace scoping and RBAC-safe read-only operations. Review determined all acceptance criteria met with LGTM status.
+
+Files Changed:
+- pkg/tools/k8s/k8s.go (created) - K8s tool with NewTool() definition and NewHandler() execution, config chain for kubeconfig, timeout handling, get/list operations for 7 resource types
+- pkg/tools/k8s/doc.go (created) - Package documentation with usage examples, RBAC configuration, kubeconfig setup
+- examples/k8s-tool/main.go (created) - Complete example querying pods and services in multiple namespaces
+- go.mod (modified) - Added k8s.io/client-go and k8s.io/apimachinery dependencies
+- go.sum (modified) - Dependency checksums
+- AGENTS.md (modified) - Added K8s tool learnings
+
+Key Decisions:
+- Config chain follows best practices: explicit path → KUBECONFIG env → ~/.kube/config → in-cluster
+- String constants extracted for repeated values (operationGet, operationList, namespaceAll)
+- Special "all" namespace value converted to metav1.NamespaceAll for cluster-wide queries
+- Params passed by pointer to query functions (per AGENTS.md guidance)
+- Timeout cap at 300s (5min) for long-running queries
+- Read-only operations only (get, list); no write/delete exposed
+- RBAC enforcement delegated to cluster (correct approach)
+- Response includes full K8s object JSON for agent consumption
+- Resource names accept singular/plural (pod/pods, service/services)
+- Secret data returned in full (acceptable; RBAC controls access)
+- Large response sizes noted as future optimization opportunity
+
+Next Task: task-010

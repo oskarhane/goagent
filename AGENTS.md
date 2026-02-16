@@ -48,6 +48,10 @@
 - **Command safety**: Support both allowlist (AllowedCommands) and blocklist (BlockedCommands); blocklist takes precedence
 - **Output limiting**: Truncate command output at configured limit to prevent memory exhaustion
 - **Exit codes**: Use -1 for non-exit errors (timeout, command not found); extract actual exit code from exec.ExitError
+- **K8s tool**: Use client-go config chain (kubeconfig path → KUBECONFIG env → ~/.kube/config → in-cluster); automatic fallback
+- **K8s namespaces**: Support special "all" value (converted to metav1.NamespaceAll) for cluster-wide queries
+- **Heavy params**: Pass large structs (>80 bytes) by pointer to query functions to avoid copying overhead
+- **String constants**: Extract repeated string literals (especially for enum-like values) as package constants for maintainability
 
 ## Agent Loop
 
