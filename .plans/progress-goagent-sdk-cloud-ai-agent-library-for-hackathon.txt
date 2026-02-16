@@ -29,3 +29,25 @@ Key Decisions:
 - Test suite deferred to task-015
 
 Next Task: task-002
+
+================================================================================
+TASK-002: Define core provider interface and abstractions
+Date: 2026-02-16T14:45:00.000Z
+================================================================================
+
+Summary:
+Created unified Provider interface and core types for LLM interactions. Defined Message, Tool, ToolCall, ToolResult, CompletionRequest/Response with full JSON support. Added helper functions for message creation and tool argument parsing. Applied review feedback to reorder Message struct fields logically.
+
+Files Changed:
+- pkg/types/types.go (created) - Core data structures: Message, Tool, ToolCall, CompletionRequest/Response, Usage, ToolResult with JSON tags and godoc
+- pkg/types/provider.go (created) - Provider interface with Complete/CompleteStream methods and ProviderError type
+- pkg/.gitkeep (removed) - No longer needed with real packages
+
+Key Decisions:
+- Unified tool call format compatible with OpenAI and Vertex AI APIs
+- Helper functions (NewUserMessage, ParseToolArguments) for better ergonomics
+- ProviderError includes Unwrap() and IsRetryable() for robust error handling
+- time.Duration in ToolResult serializes as int64 nanoseconds (acceptable for internal use)
+- Struct field order: Role, Content, ToolCalls, ToolCallID, Name (per review)
+
+Next Task: task-003

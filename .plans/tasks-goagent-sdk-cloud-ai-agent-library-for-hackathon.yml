@@ -22,7 +22,7 @@ tasks:
     title: "Define core provider interface and abstractions"
     description: |
       Create unified interface for LLM providers with consistent completion methods. Define core types for messages, tools, and responses that work across OpenAI and Vertex AI.
-    status: pending
+    status: completed
     dependencies:
       - task-001
     acceptance_criteria:
@@ -31,7 +31,7 @@ tasks:
       - "Interface supports both OpenAI and Vertex AI patterns"
       - "Type definitions include proper JSON tags"
       - "GoDoc documentation complete for all public types"
-    completed_at: null
+    completed_at: 2026-02-16T14:45:00.000Z
 
   - id: task-003
     title: "Implement OpenAI provider"

@@ -18,3 +18,9 @@
 - **Makefile targets**: Provide test/lint/build/docs for dev workflow
 - **Shell scripts**: Keep build logic in scripts/ for CI reuse
 - **Test output**: `[no test files]` is expected until task-015; not an error
+
+## API Design
+
+- **Struct field order**: Group logically (identity fields first, then content, then metadata) for API stability
+- **JSON tag consistency**: Use omitempty for optional fields; explicit tags prevent refactor breakage
+- **Helper constructors**: Provide NewXMessage() functions for common message types (better UX)
