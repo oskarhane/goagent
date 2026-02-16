@@ -24,6 +24,7 @@
 - **Struct field order**: Group logically (identity fields first, then content, then metadata) for API stability
 - **JSON tag consistency**: Use omitempty for optional fields; explicit tags prevent refactor breakage
 - **Helper constructors**: Provide NewXMessage() functions for common message types (better UX)
+- **Zero value handling**: Use pointer types (*float64) for numeric config fields when zero is a valid setting
 ## Provider Implementation
 
 - **Request mutation**: Copy pointer params before modification to avoid mutating caller's data
@@ -41,3 +42,11 @@
 - **Type compatibility**: Support both []string and []any for required field arrays (Go JSON decoding)
 - **Thread safety**: Use sync.RWMutex for registries with read-heavy workloads
 - **Builder pattern**: Fluent API with StringParam, IntegerParam, etc. improves ergonomics vs raw schema
+
+## Agent Loop
+
+- **Iteration limit**: Default 10 max iterations prevents infinite loops; configurable via Config
+- **Context checks**: Check ctx.Done() at start of each iteration (not just once at beginning)
+- **Tool result conversion**: Convert ToolResult to Message with RoleTool for next LLM call
+- **State tracking**: Track iterations, total tokens, messages, execution time in RunResult
+- **Nil slice checks**: Use `len(slice) > 0` not `slice != nil && len(slice) > 0` (gosimple S1009)
