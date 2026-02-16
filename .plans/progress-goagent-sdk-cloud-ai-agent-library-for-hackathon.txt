@@ -176,3 +176,31 @@ Key Decisions:
 - Build succeeds with no errors
 
 Next Task: task-007
+
+================================================================================
+TASK-007: Create built-in HTTP request tool
+Date: 2026-02-16T13:15:00.000Z
+================================================================================
+
+Summary:
+Implemented HTTP client tool for making REST API calls from agents. Supports GET, POST, PUT, PATCH, DELETE with authentication headers, request/response bodies, timeout control, context cancellation. Applied review feedback: added PATCH method support and default User-Agent header.
+
+Files Changed:
+- pkg/tools/http/http.go (created) - HTTP tool with NewTool() definition and NewHandler() execution, configurable timeout/max response size, automatic Content-Type detection, structured response with status/headers/body
+- pkg/tools/http/doc.go (created) - Package documentation with usage examples
+- examples/http-tool/main.go (created) - Complete example using HTTP tool to query JSONPlaceholder API
+- pkg/tools/builder.go (modified) - Added StringParamWithEnum for method validation
+- pkg/tools/doc.go (modified) - Updated with HTTP tool usage
+
+Key Decisions:
+- Builder pattern (StringParamWithEnum) for HTTP methods: GET, POST, PUT, PATCH, DELETE
+- Default User-Agent "GoAgent/1.0" set if not provided (many APIs require it)
+- Configurable defaults: 30s timeout, 10MB max response size
+- Automatic JSON Content-Type detection using isJSON helper
+- Response size limiting with io.LimitReader prevents OOM
+- Structured Response type with status_code, status, headers, body, error fields
+- Error field populated for 4xx/5xx status codes (convenience for agents)
+- Context propagation via NewRequestWithContext for proper cancellation
+- All linting checks pass
+
+Next Task: task-008

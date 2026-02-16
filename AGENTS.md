@@ -42,6 +42,8 @@
 - **Type compatibility**: Support both []string and []any for required field arrays (Go JSON decoding)
 - **Thread safety**: Use sync.RWMutex for registries with read-heavy workloads
 - **Builder pattern**: Fluent API with StringParam, IntegerParam, etc. improves ergonomics vs raw schema
+- **HTTP tool**: Set User-Agent by default; many APIs reject requests without it
+- **Method validation**: Use StringParamWithEnum for HTTP method validation (type safety + clear API)
 
 ## Agent Loop
 
