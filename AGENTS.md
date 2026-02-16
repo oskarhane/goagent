@@ -44,6 +44,10 @@
 - **Builder pattern**: Fluent API with StringParam, IntegerParam, etc. improves ergonomics vs raw schema
 - **HTTP tool**: Set User-Agent by default; many APIs reject requests without it
 - **Method validation**: Use StringParamWithEnum for HTTP method validation (type safety + clear API)
+- **Shell tool**: Use "sh -c" for proper shell parsing; default blocked commands for safety (rm -rf /, mkfs, fork bombs)
+- **Command safety**: Support both allowlist (AllowedCommands) and blocklist (BlockedCommands); blocklist takes precedence
+- **Output limiting**: Truncate command output at configured limit to prevent memory exhaustion
+- **Exit codes**: Use -1 for non-exit errors (timeout, command not found); extract actual exit code from exec.ExitError
 
 ## Agent Loop
 

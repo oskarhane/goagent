@@ -204,3 +204,32 @@ Key Decisions:
 - All linting checks pass
 
 Next Task: task-008
+
+================================================================================
+TASK-008: Create built-in shell execution tool
+Date: 2026-02-16T12:12:29.000Z
+================================================================================
+
+Summary:
+Implemented shell command execution tool with safety constraints, output capture, and working directory/environment control. Applied review feedback: fixed redundant newline in test output, corrected working_dir JSON key mismatch.
+
+Files Changed:
+- pkg/tools/shell/shell.go (created) - Shell tool with NewTool() definition and NewHandler() execution, configurable allowed/blocked commands, timeout, output size limits, exit code handling
+- pkg/tools/shell/doc.go (created) - Package documentation with usage examples and security considerations
+- examples/shell-tool/main.go (created) - Complete example using shell tool for system diagnostics
+- examples/shell-tool-direct/main.go (created) - Direct test suite with 7 test cases validating all features
+- AGENTS.md (modified) - Added shell tool learnings (User-Agent, method validation, command safety, output limiting, exit codes)
+
+Key Decisions:
+- Use "sh -c" for proper shell parsing instead of direct command execution
+- Support both allowlist (AllowedCommands) and blocklist (BlockedCommands); blocklist takes precedence
+- Safety defaults: blocked commands include rm -rf /, mkfs, dd, fork bombs
+- Output truncation at configured limit (default 1MB) prevents memory exhaustion
+- Exit code extraction from exec.ExitError; -1 for non-exit errors (timeout, not found)
+- Configurable timeout (default 5min max), working directory, environment variables
+- #nosec G204 annotation acknowledges intentional command execution for gosec
+- Structured Response type with exit_code, stdout, stderr, error, working_dir, execution_time
+- Context cancellation checked after command execution
+- Review fixes: removed redundant newline in Println, fixed workingDir→working_dir JSON key
+
+Next Task: task-009
