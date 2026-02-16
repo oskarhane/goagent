@@ -372,7 +372,7 @@ Key packages:
 
 ### Prerequisites
 
-- Go 1.25 or later
+- Go 1.26 or later
 - Make
 
 ### Setup

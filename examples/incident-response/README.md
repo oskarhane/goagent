@@ -21,7 +21,7 @@ The agent:
 
 1. **OpenAI API key** - Set in environment variable
 2. **Kubernetes cluster access** - Optional, for K8s investigation
-3. **Go 1.25+**
+3. **Go 1.26+**
 
 ## Quick Start
 

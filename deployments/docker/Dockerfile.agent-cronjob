@@ -2,7 +2,7 @@
 # This configuration is optimized for periodic execution via CronJob
 # Focus on fast startup and efficient resource usage
 
-FROM golang:1.25-alpine AS builder
+FROM golang:1.26-alpine AS builder
 
 RUN apk add --no-cache git make
 

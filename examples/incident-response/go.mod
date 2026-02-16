@@ -1,6 +1,6 @@
 module incident-response
 
-go 1.25.0
+go 1.26
 
 require github.com/oskarhane/goagent v0.0.0
 

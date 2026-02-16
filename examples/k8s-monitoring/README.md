@@ -15,7 +15,7 @@ The agent:
 
 1. **Kubernetes cluster access** - The agent needs a valid kubeconfig
 2. **OpenAI API key** - Set in environment variable
-3. **Go 1.25+**
+3. **Go 1.26+**
 
 ## Quick Start
 
