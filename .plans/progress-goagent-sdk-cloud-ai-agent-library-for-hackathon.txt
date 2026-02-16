@@ -102,3 +102,31 @@ Key Decisions:
 
 Next Task: task-005
 
+================================================================================
+TASK-005: Build tool system with JSON Schema validation
+Date: 2026-02-16T12:54:30.000Z
+================================================================================
+
+Summary:
+Implemented comprehensive tool system with registry, JSON Schema validation, and builder pattern. Created thread-safe Registry for tool management, lightweight validator supporting all JSON types, and fluent Builder API for tool definition. Applied review feedback: added nil value handling for optional fields. Includes validation examples and calculator tool demo.
+
+Files Changed:
+- pkg/tools/registry.go (created/modified) - Registry with thread-safe tool management, validation, execution; added nil handling for optional fields
+- pkg/tools/builder.go (created) - Fluent Builder API for tool definition with type-safe parameters
+- pkg/tools/doc.go (created) - Package documentation with usage examples
+- examples/tools-basic/main.go (created) - Calculator tool example with provider integration
+- examples/tools-validation/main.go (created) - Comprehensive validation test suite
+
+Key Decisions:
+- Thread-safe Registry using sync.RWMutex for concurrent access
+- Lightweight JSON Schema validator (type checking, required fields, nested objects, arrays)
+- Handle both []string and []any for required field arrays (Go type compatibility)
+- Builder pattern for ergonomic tool creation (StringParam, IntegerParam, ObjectParam, etc.)
+- Validation occurs before execution in handlers (defensive programming)
+- No panic recovery in Execute (let handlers handle their own errors)
+- Nil values in optional fields skip validation; nil in required fields error
+- All 6 validation test cases pass (required fields, type checking, nested validation)
+- Unit tests deferred to task-015 per plan
+
+Next Task: task-006
+

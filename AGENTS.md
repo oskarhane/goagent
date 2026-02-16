@@ -34,3 +34,10 @@
 - **API format mapping**: Role mapping (assistant→model, tool→function) and response format conversion critical for Vertex AI
 - **Vertex AI system messages**: Use systemInstruction field, not system role (Gemini doesn't support it)
 - **Tool call IDs**: Use crypto/rand for unique IDs; time.Now().UnixNano() can collide in parallel calls
+
+## Tool System
+
+- **JSON Schema validation**: Handle nil values in optional fields separately from required fields
+- **Type compatibility**: Support both []string and []any for required field arrays (Go JSON decoding)
+- **Thread safety**: Use sync.RWMutex for registries with read-heavy workloads
+- **Builder pattern**: Fluent API with StringParam, IntegerParam, etc. improves ergonomics vs raw schema
