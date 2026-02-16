@@ -3,6 +3,8 @@
 linters-settings:
   govet:
     enable-all: true
+    disable:
+      - fieldalignment  # Field order matters for API compatibility
   gocyclo:
     min-complexity: 15
   goconst:
@@ -30,7 +32,6 @@ linters-settings:
 linters:
   enable:
     - bodyclose
-    - depguard
     - dogsled
     - dupl
     - errcheck

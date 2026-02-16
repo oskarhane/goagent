@@ -1,4 +1,5 @@
 defaultAgent: opencode
 models:
-  opencode: claude-sonnet-4-20250514
-  claude: gpt-5.2-codex
+  opencode: claude-sonnet-4-5
+  claude: claude-sonnet-4-5
+  review: claude-opus-4-5

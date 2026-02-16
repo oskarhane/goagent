@@ -24,7 +24,7 @@ type Provider interface {
 	//
 	// Errors returned should provide clear, actionable information about what
 	// went wrong (authentication, rate limits, invalid requests, etc.).
-	Complete(ctx context.Context, req CompletionRequest) (*CompletionResponse, error)
+	Complete(ctx context.Context, req *CompletionRequest) (*CompletionResponse, error)
 
 	// Name returns a human-readable identifier for this provider.
 	// Used in logging and error messages to identify which provider is in use.
