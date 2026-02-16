@@ -6,24 +6,23 @@ on:
   pull_request:
     branches: [ main, develop ]
 
+env:
+  GO_VERSION: '1.26'
+
 jobs:
   test:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        go-version: [ '1.26', '1.25' ]
-
     steps:
     - uses: actions/checkout@v4
 
     - name: Set up Go
       uses: actions/setup-go@v5
       with:
-        go-version: ${{ matrix.go-version }}
+        go-version: ${{ env.GO_VERSION }}
         cache: false
 
     - name: Clean Go cache
-      run: go clean -cache
+      run: go clean -cache -testcache
 
     - name: Download dependencies
       run: go mod download
@@ -53,7 +52,11 @@ jobs:
     - name: Set up Go
       uses: actions/setup-go@v5
       with:
-        go-version: '1.26'
+        go-version: ${{ env.GO_VERSION }}
+        cache: false
+
+    - name: Clean Go cache
+      run: go clean -cache
 
     - name: Install golangci-lint
       run: go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
@@ -69,8 +72,11 @@ jobs:
     - name: Set up Go
       uses: actions/setup-go@v5
       with:
-        go-version: '1.26'
+        go-version: ${{ env.GO_VERSION }}
         cache: false
+
+    - name: Clean Go cache
+      run: go clean -cache
 
     - name: Install gosec
       run: go install github.com/securego/gosec/v2/cmd/gosec@latest
