@@ -89,10 +89,10 @@ Summary:
 Implemented core agent-as-tool pattern: wrapped investigator agent as callable tool for coordinator. Created investigate_service tool with Builder pattern, handler factory for agent execution, and comprehensive test suite with shared test helpers.
 
 Files Changed:
-- examples/incident-response/agent_tool.go (created - investigate_service tool definition and handler factory)
-- examples/incident-response/agent_tool_test.go (created - 6 tests covering tool creation, handler behavior, error propagation)
-- examples/incident-response/test_helpers.go (created - shared mockProvider to avoid duplication across test files)
-- examples/incident-response/investigator_test.go (modified - removed duplicate mockProvider, now uses test_helpers.go)
+- examples/agent-as-tool/agent_tool.go (created - investigate_service tool definition and handler factory)
+- examples/agent-as-tool/agent_tool_test.go (created - 6 tests covering tool creation, handler behavior, error propagation)
+- examples/agent-as-tool/test_helpers.go (created - shared mockProvider to avoid duplication across test files)
+- examples/agent-as-tool/investigator_test.go (modified - removed duplicate mockProvider, now uses test_helpers.go)
 
 Key Decisions:
 - Tool accepts service_name and incident_type params; both required
@@ -103,3 +103,22 @@ Key Decisions:
 - Tool result serializes agent.RunResult as JSON for clean propagation
 
 Next Task: task-006
+================================================================================
+TASK-006: Implement coordinator agent setup
+Date: 2026-02-16T20:30:00.000Z
+================================================================================
+
+Summary:
+Implemented coordinator agent in main.go with OpenAI provider (gpt-5.1), comprehensive triage system prompt, investigate_service tool registration, and configurable logging. Agent configured with max 10 iterations for multi-service investigation orchestration.
+
+Files Changed:
+- examples/agent-as-tool/main.go (created - coordinator agent setup with provider initialization, logger config, tool registration)
+
+Key Decisions:
+- Logger level switches between Info (default) and Debug (when DEBUG=true) for development flexibility
+- System prompt emphasizes coordinator role: delegate to investigate_service, synthesize findings, never investigate directly
+- investigate_service tool takes service_name and incident_type params for contextual sub-agent execution
+- Max iterations 10 (2x investigator's 5) allows multi-service investigation cycles
+- godotenv/autoload pattern simplifies .env usage in examples
+
+Next Task: task-007

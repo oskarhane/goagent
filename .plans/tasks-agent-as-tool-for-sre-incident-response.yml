@@ -81,7 +81,7 @@ tasks:
     title: "Implement coordinator agent setup"
     description: |
       Create main.go with coordinator agent configuration. Coordinator has system prompt for SRE triage/routing, access to investigate_service tool (wrapping investigator), and max 10 iterations. Use openai.NewProvider with gpt-5.1 model. Include logger setup with debug mode via DEBUG env var.
-    status: pending
+    status: completed
     dependencies:
       - task-005
     acceptance_criteria:
@@ -90,7 +90,7 @@ tasks:
       - "investigate_service tool registered to coordinator"
       - "Logger configured with Info/Debug levels"
       - "Max iterations set to 10"
-    completed_at: null
+    completed_at: 2026-02-16T20:30:00.000Z
 
   - id: task-007
     title: "Implement main execution flow and output formatting"
