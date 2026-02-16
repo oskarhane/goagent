@@ -21,7 +21,7 @@
 //
 // Example usage:
 //
-//	provider, err := vertex.NewProvider(vertex.Config{
+//	provider, err := vertex.NewProvider(&vertex.Config{
 //	    ProjectID: "my-gcp-project",
 //	    Location:  "us-central1",
 //	})

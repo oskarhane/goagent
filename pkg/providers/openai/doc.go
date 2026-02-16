@@ -16,7 +16,7 @@
 //
 // Example usage:
 //
-//	provider, err := openai.NewProvider(openai.Config{
+//	provider, err := openai.NewProvider(&openai.Config{
 //	    APIKey: os.Getenv("OPENAI_API_KEY"),
 //	})
 //	if err != nil {

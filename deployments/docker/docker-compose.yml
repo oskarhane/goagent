@@ -1,0 +1,101 @@
+version: '3.8'
+
+services:
+  # Basic agent service with OpenAI
+  agent-openai:
+    build:
+      context: ../..
+      dockerfile: Dockerfile
+      args:
+        VERSION: ${VERSION:-dev}
+    image: goagent:${VERSION:-dev}
+    container_name: goagent-openai
+    environment:
+      # OpenAI Configuration
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - OPENAI_MODEL=${OPENAI_MODEL:-gpt-4-turbo-preview}
+      
+      # Agent Configuration
+      - LOG_LEVEL=${LOG_LEVEL:-info}
+      - MAX_ITERATIONS=${MAX_ITERATIONS:-10}
+      - TIMEOUT=${TIMEOUT:-300}
+      
+      # Observability
+      - ENABLE_TRACING=${ENABLE_TRACING:-false}
+      - OTEL_EXPORTER_OTLP_ENDPOINT=${OTEL_EXPORTER_OTLP_ENDPOINT:-}
+    
+    # Uncomment for kubeconfig access
+    # volumes:
+    #   - ~/.kube/config:/home/goagent/.kube/config:ro
+    
+    restart: unless-stopped
+    
+    # Resource limits
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 512M
+        reservations:
+          cpus: '0.5'
+          memory: 256M
+
+  # Agent service with Vertex AI
+  agent-vertex:
+    build:
+      context: ../..
+      dockerfile: Dockerfile
+      args:
+        VERSION: ${VERSION:-dev}
+    image: goagent:${VERSION:-dev}
+    container_name: goagent-vertex
+    environment:
+      # Vertex AI Configuration
+      - GOOGLE_CLOUD_PROJECT=${GOOGLE_CLOUD_PROJECT}
+      - GOOGLE_APPLICATION_CREDENTIALS=${GOOGLE_APPLICATION_CREDENTIALS:-/app/credentials/gcloud-key.json}
+      - VERTEX_LOCATION=${VERTEX_LOCATION:-us-central1}
+      - VERTEX_MODEL=${VERTEX_MODEL:-gemini-1.5-pro}
+      
+      # Agent Configuration
+      - LOG_LEVEL=${LOG_LEVEL:-info}
+      - MAX_ITERATIONS=${MAX_ITERATIONS:-10}
+      - TIMEOUT=${TIMEOUT:-300}
+    
+    volumes:
+      # Mount service account key
+      - ${GOOGLE_CREDENTIALS_PATH:-./credentials}:/app/credentials:ro
+    
+    restart: unless-stopped
+    
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 512M
+        reservations:
+          cpus: '0.5'
+          memory: 256M
+
+  # Development agent with hot-reload (using mounted source)
+  agent-dev:
+    build:
+      context: ../..
+      dockerfile: deployments/docker/Dockerfile.agent-service
+      args:
+        VERSION: dev
+    image: goagent:dev
+    container_name: goagent-dev
+    environment:
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - LOG_LEVEL=debug
+      - MAX_ITERATIONS=10
+    
+    # Mount source code for development
+    volumes:
+      - ../../:/app/src:ro
+    
+    restart: unless-stopped
+
+networks:
+  default:
+    name: goagent-network

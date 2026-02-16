@@ -22,7 +22,7 @@
 //
 //	func main() {
 //	    // Create provider
-//	    provider, _ := openai.NewProvider(openai.Config{
+//	    provider, _ := openai.NewProvider(&openai.Config{
 //	        APIKey: "your-api-key",
 //	    })
 //
@@ -40,7 +40,7 @@
 //	    registry.MustRegister(shellTool, shellHandler)
 //
 //	    // Create and use agent
-//	    a, _ := agent.NewAgent(agent.Config{
+//	    a, _ := agent.NewAgent(&agent.Config{
 //	        Provider: provider,
 //	        Registry: registry,
 //	    })

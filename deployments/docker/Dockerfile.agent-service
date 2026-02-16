@@ -1,0 +1,55 @@
+# Example Dockerfile for agent running as a long-running service
+# This configuration is suitable for agents that need to run continuously
+# and process requests via HTTP endpoints or message queues
+
+FROM golang:1.25-alpine AS builder
+
+RUN apk add --no-cache git make
+
+WORKDIR /build
+
+COPY go.mod go.sum ./
+RUN go mod download
+
+COPY . .
+
+ARG VERSION=dev
+RUN CGO_ENABLED=0 GOOS=linux go build \
+    -ldflags="-w -s -X main.version=${VERSION}" \
+    -o goagent \
+    ./cmd/goagent
+
+# Runtime stage
+FROM alpine:latest
+
+RUN apk add --no-cache ca-certificates tzdata curl
+
+RUN addgroup -g 1000 goagent && \
+    adduser -D -u 1000 -G goagent goagent
+
+WORKDIR /app
+
+COPY --from=builder /build/goagent /app/goagent
+
+RUN chown -R goagent:goagent /app
+
+USER goagent
+
+# Service typically runs on port 8080
+EXPOSE 8080
+
+# Health check for service availability
+HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
+    CMD ["/app/goagent", "--version"]
+
+# Environment variables for service mode
+ENV LOG_LEVEL=info \
+    MAX_ITERATIONS=10 \
+    TIMEOUT=300 \
+    ENABLE_METRICS=true \
+    ENABLE_TRACING=true
+
+ENTRYPOINT ["/app/goagent"]
+
+# Default command shows help until service mode is implemented
+CMD ["--help"]

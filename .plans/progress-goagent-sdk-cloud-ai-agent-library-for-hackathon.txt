@@ -332,3 +332,38 @@ Key Decisions:
 - Review fixes: corrected misleading comment about system message preservation, removed emojis from test output per AGENTS.md guidelines
 
 Next Task: task-012
+
+================================================================================
+TASK-012: Create Docker deployment configuration
+Date: 2026-02-16T16:45:00.000Z
+================================================================================
+
+Summary:
+Created comprehensive Docker deployment configuration with multi-stage builds, security best practices, and example deployments. Includes base Dockerfile, service/cronjob variants, docker-compose setup, and detailed README. Applied review feedback: changed CMD from ["run"] to ["--help"] (service mode not yet implemented), removed unnecessary README.md exception from .dockerignore.
+
+Files Changed:
+- Dockerfile (created) - Multi-stage build with Go 1.25 builder, Alpine runtime, non-root user (UID 1000), health check via --version
+- .dockerignore (created) - Excludes build artifacts, IDE files, examples, secrets, git history
+- deployments/docker/Dockerfile.agent-service (created) - Service variant with EXPOSE 8080, metrics/tracing env vars, curl for health checks
+- deployments/docker/Dockerfile.agent-cronjob (created) - CronJob variant with minimal deps, no health check, JOB_MODE env var
+- deployments/docker/docker-compose.yml (created) - Example orchestration with goagent service + postgres
+- deployments/docker/README.md (created) - Comprehensive guide covering all deployment patterns, security, customization
+- examples/docker-agent/main.go (created) - Example agent implementation using HTTP and K8s tools
+- examples/docker-agent/Dockerfile (created) - Example-specific Dockerfile with custom tool integration
+- examples/docker-agent/.env.example (created) - Template for required environment variables
+- .github/workflows/docker.yml (created) - CI workflow for Docker build validation on relevant file changes
+- Makefile (modified) - Added docker-build, docker-run, docker-clean targets
+- pkg/agent/doc.go (modified) - Fixed config pointer syntax in examples (cleanup from task-010)
+- pkg/logger/doc.go (modified) - Fixed config pointer syntax in examples (cleanup from task-010)
+
+Key Decisions:
+- Multi-stage builds reduce final image to ~20MB (Go 1.25-alpine builder + alpine:latest runtime)
+- Non-root user (goagent:goagent UID/GID 1000) for security
+- Health check uses --version flag (placeholder until HTTP endpoints added)
+- Service/CronJob variants use --help CMD until service mode implemented in future task
+- Example Dockerfiles show custom tool integration patterns
+- Docker CI workflow validates builds but doesn't publish (registry push deferred)
+- ca-certificates included for HTTPS API calls
+- .dockerignore removes README.md exception (not needed in image)
+
+Next Task: task-013

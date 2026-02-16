@@ -1,0 +1,50 @@
+# Example Dockerfile for agent running as a scheduled job
+# This configuration is optimized for periodic execution via CronJob
+# Focus on fast startup and efficient resource usage
+
+FROM golang:1.25-alpine AS builder
+
+RUN apk add --no-cache git make
+
+WORKDIR /build
+
+COPY go.mod go.sum ./
+RUN go mod download
+
+COPY . .
+
+ARG VERSION=dev
+RUN CGO_ENABLED=0 GOOS=linux go build \
+    -ldflags="-w -s -X main.version=${VERSION}" \
+    -o goagent \
+    ./cmd/goagent
+
+# Minimal runtime stage for CronJob
+FROM alpine:latest
+
+# Minimal dependencies for scheduled jobs
+RUN apk add --no-cache ca-certificates
+
+RUN addgroup -g 1000 goagent && \
+    adduser -D -u 1000 -G goagent goagent
+
+WORKDIR /app
+
+COPY --from=builder /build/goagent /app/goagent
+
+RUN chown -R goagent:goagent /app
+
+USER goagent
+
+# No health check needed for CronJob (runs to completion)
+
+# Environment variables for job mode
+ENV LOG_LEVEL=info \
+    MAX_ITERATIONS=10 \
+    TIMEOUT=600 \
+    JOB_MODE=true
+
+ENTRYPOINT ["/app/goagent"]
+
+# Default command shows help until job mode is implemented
+CMD ["--help"]

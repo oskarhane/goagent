@@ -60,3 +60,27 @@
 - **Tool result conversion**: Convert ToolResult to Message with RoleTool for next LLM call
 - **State tracking**: Track iterations, total tokens, messages, execution time in RunResult
 - **Nil slice checks**: Use `len(slice) > 0` not `slice != nil && len(slice) > 0` (gosimple S1009)
+- **Conversation history**: Pass previous Messages via RunOptions.History to maintain context across interactions
+- **History limiting**: Use MaxHistoryMessages to trim history from oldest messages when limit exceeded
+- **History serialization**: Messages serialize/deserialize to JSON cleanly for persistence (no custom marshaling needed)
+
+## Logging and Tracing
+
+- **Logger injection**: Pass logger to Agent and Provider configs; defaults to Noop logger if nil
+- **Log levels**: Debug (iteration details), Info (major events), Warn (retries, errors), Error (failures)
+- **Structured output**: All logs JSON-formatted with timestamp, level, message, fields
+- **OpenTelemetry**: Optional tracing via TracerName in logger config; creates spans for agent.run, provider.complete
+- **Span management**: Use defer pattern for EndSpan to capture errors; check span != nil before recording events
+- **Config pointers**: Use pointer receivers for Config structs >80 bytes to avoid copying overhead (hugeParam)
+
+## Docker Deployment
+
+- **Multi-stage builds**: Separate builder and runtime stages for minimal image size (~20MB final)
+- **Non-root user**: Always run as UID 1000; create user in Dockerfile with adduser/addgroup
+- **Health checks**: Use `--version` flag as basic health indicator; adjust interval/timeout per use case
+- **Base images**: Use golang:1.25-alpine for build, alpine:latest for runtime
+- **Security**: Include ca-certificates for HTTPS, never include secrets in image layers
+- **Image variants**: Provide specialized Dockerfiles for different deployment patterns (service, cronjob)
+- **Build args**: Use VERSION build arg for ldflags injection during docker build
+- **.dockerignore**: Exclude examples/, .plans/, .env files, and test artifacts to reduce context size
+- **CMD placeholder**: Use `["--help"]` as CMD for unimplemented modes (service/cronjob) rather than non-existent subcommands

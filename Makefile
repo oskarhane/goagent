@@ -72,6 +72,42 @@ ci-test: ## Run tests for CI
 ci-lint: ## Run linting for CI  
 	@PATH=$(shell go env GOPATH)/bin:$(PATH) golangci-lint run --timeout=5m
 
+# Docker
+docker-build: ## Build Docker image
+	@echo "Building Docker image..."
+	@docker build -t goagent:latest --build-arg VERSION=$(shell git describe --tags --always --dirty 2>/dev/null || echo "dev") .
+	@echo "Docker image built: goagent:latest"
+
+docker-build-service: ## Build service variant Docker image
+	@echo "Building service variant Docker image..."
+	@docker build -t goagent:service -f deployments/docker/Dockerfile.agent-service --build-arg VERSION=$(shell git describe --tags --always --dirty 2>/dev/null || echo "dev") .
+	@echo "Docker image built: goagent:service"
+
+docker-build-cronjob: ## Build cronjob variant Docker image
+	@echo "Building cronjob variant Docker image..."
+	@docker build -t goagent:cronjob -f deployments/docker/Dockerfile.agent-cronjob --build-arg VERSION=$(shell git describe --tags --always --dirty 2>/dev/null || echo "dev") .
+	@echo "Docker image built: goagent:cronjob"
+
+docker-build-all: docker-build docker-build-service docker-build-cronjob ## Build all Docker image variants
+	@echo "All Docker images built!"
+
+docker-run: ## Run Docker container locally
+	@echo "Running Docker container..."
+	@docker run --rm -it --env-file .env goagent:latest
+
+docker-compose-up: ## Start services with Docker Compose
+	@echo "Starting Docker Compose services..."
+	@cd deployments/docker && docker-compose up -d
+	@echo "Services started! Run 'make docker-compose-logs' to view logs"
+
+docker-compose-down: ## Stop Docker Compose services
+	@echo "Stopping Docker Compose services..."
+	@cd deployments/docker && docker-compose down
+	@echo "Services stopped!"
+
+docker-compose-logs: ## View Docker Compose logs
+	@cd deployments/docker && docker-compose logs -f
+
 # Development workflow
 dev: fmt lint test build ## Run development workflow (fmt, lint, test, build)
 	@echo "Development workflow complete!"
