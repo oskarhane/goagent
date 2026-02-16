@@ -122,3 +122,26 @@ Key Decisions:
 - godotenv/autoload pattern simplifies .env usage in examples
 
 Next Task: task-007
+================================================================================
+TASK-007: Implement main execution flow and output formatting
+Date: 2026-02-16T21:15:00.000Z
+================================================================================
+
+Summary:
+Completed main execution flow with incident input handling (CLI args or default scenario), coordinator agent.Run() execution, hierarchical output formatting showing delegation flow, investigation findings extraction, and execution statistics display. Added 60s timeout for defensive execution limiting.
+
+Files Changed:
+- examples/agent-as-tool/main.go (modified - added execution flow lines 102-194, helper functions extractInvestigatedServices/extractInvestigationFindings, 60s context timeout)
+- examples/agent-as-tool/main_test.go (created - 10 tests covering helper functions for service extraction and findings parsing)
+- examples/agent-as-tool/agent-as-tool (deleted - removed binary artifact from git)
+- .gitignore (modified - added examples/agent-as-tool/agent-as-tool to prevent future binary commits)
+
+Key Decisions:
+- Context timeout set to 60s (context.WithTimeout) per acceptance criteria to prevent runaway execution
+- Output structured in sections: incident report, delegation hierarchy, investigation findings, final analysis, stats
+- Helper functions extractInvestigatedServices/extractInvestigationFindings parse Message history for output formatting
+- Tool results (RoleTool messages with name="investigate_service") extracted for findings display
+- Execution stats (iterations, tokens, duration) printed from RunResult for performance visibility
+- Tests cover edge cases: empty messages, malformed JSON, missing tool calls
+
+Next Task: task-008

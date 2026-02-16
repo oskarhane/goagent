@@ -32,3 +32,4 @@ vendor/
 
 # Debug
 __debug_bin*
+examples/agent-as-tool/agent-as-tool

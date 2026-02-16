@@ -5,6 +5,7 @@ go 1.26
 replace github.com/oskarhane/goagent => ../..
 
 require (
+	github.com/joho/godotenv v1.5.1
 	github.com/oskarhane/goagent v0.0.0
 	github.com/stretchr/testify v1.11.1
 )

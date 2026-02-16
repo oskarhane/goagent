@@ -96,7 +96,7 @@ tasks:
     title: "Implement main execution flow and output formatting"
     description: |
       Complete main.go with incident execution flow. Accept incident description from command line args or use default scenario. Run coordinator agent, format output showing delegation hierarchy, tool execution, and investigation findings. Print execution stats (iterations, tokens, duration).
-    status: pending
+    status: completed
     dependencies:
       - task-006
       - task-003
@@ -107,7 +107,8 @@ tasks:
       - "Displays investigation findings from both agents"
       - "Prints stats: iterations, tokens, duration"
       - "Completes execution within 60 seconds"
-    completed_at: null
+      - "Uses API key in .env file."
+    completed_at: 2026-02-16T21:15:00.000Z
 
   - id: task-008
     title: "Write comprehensive README with architecture"

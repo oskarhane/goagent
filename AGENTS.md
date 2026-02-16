@@ -149,3 +149,5 @@
 - **Panic protection**: Add nil/empty checks in slice access methods (e.g., Default() returning slice[0]) even if factory guarantees population; defensive coding prevents runtime panics
 - **Agent factories**: Agent factory functions require provider param for initialization; extend spec signature if needed (e.g., NewInvestigator(service, provider, registry) vs spec's (service, registry))
 - **Test helpers**: Extract shared mocks (e.g., mockProvider) to test_helpers.go when used by multiple test files; avoids duplication while maintaining isolation
+- **Context timeout**: Add explicit timeout (context.WithTimeout) for example main() execution to prevent runaway LLM interactions; defensive coding even when LLM providers have their own timeouts
+- **Binary artifacts**: Add example binaries to .gitignore immediately when creating new examples; prevents accidental commits

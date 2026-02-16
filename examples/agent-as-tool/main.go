@@ -2,14 +2,17 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"log"
 	"os"
+	"time"
 
 	"github.com/oskarhane/goagent/pkg/agent"
 	"github.com/oskarhane/goagent/pkg/logger"
 	"github.com/oskarhane/goagent/pkg/providers/openai"
 	"github.com/oskarhane/goagent/pkg/tools"
+	"github.com/oskarhane/goagent/pkg/types"
 
 	_ "github.com/joho/godotenv/autoload"
 )
@@ -108,8 +111,9 @@ Be systematic and thorough. Provide a clear incident summary with:
 		incident = defaultScenario.GetIncidentDescription()
 	}
 
-	// Run coordinator agent
-	ctx := context.Background()
+	// Run coordinator agent with 60s timeout to prevent runaway execution
+	ctx, cancel := context.WithTimeout(context.Background(), 60*time.Second)
+	defer cancel()
 
 	fmt.Println("=== Agent-as-Tool: Hierarchical SRE Investigation ===")
 	fmt.Println("\n--- Incident Report ---")
@@ -124,8 +128,32 @@ Be systematic and thorough. Provide a clear incident summary with:
 		log.Fatalf("Investigation failed: %v", result.Error)
 	}
 
-	// Print investigation results
-	fmt.Println("\n=== Investigation Results ===")
+	// Print delegation hierarchy - show which services were investigated
+	fmt.Println("\n--- Delegation Hierarchy ---")
+	fmt.Println("Coordinator → Investigator Agents:")
+	investigatedServices := extractInvestigatedServices(result.Messages)
+	if len(investigatedServices) == 0 {
+		fmt.Println("  (No delegations occurred)")
+	} else {
+		for i, service := range investigatedServices {
+			fmt.Printf("  %d. Investigating: %s\n", i+1, service)
+		}
+	}
+
+	// Print investigation findings from delegated agents
+	fmt.Println("\n--- Investigation Findings ---")
+	findings := extractInvestigationFindings(result.Messages)
+	if len(findings) == 0 {
+		fmt.Println("(No investigation findings)")
+	} else {
+		for i, finding := range findings {
+			fmt.Printf("\nService Investigation #%d:\n%s\n", i+1, finding)
+			fmt.Println("---")
+		}
+	}
+
+	// Print final coordinator analysis
+	fmt.Println("\n=== Coordinator Final Analysis ===")
 	fmt.Println(result.Response.Content)
 
 	// Print execution statistics
@@ -133,4 +161,36 @@ Be systematic and thorough. Provide a clear incident summary with:
 	fmt.Printf("Coordinator iterations: %d\n", result.Iterations)
 	fmt.Printf("Total tokens used: %d\n", result.TotalTokens)
 	fmt.Printf("Total execution time: %.2fs\n", result.ExecutionTime.Seconds())
+}
+
+// extractInvestigatedServices parses messages to find which services were investigated
+func extractInvestigatedServices(messages []types.Message) []string {
+	var services []string
+	for _, msg := range messages {
+		if msg.Role == types.RoleAssistant && len(msg.ToolCalls) > 0 {
+			for _, tc := range msg.ToolCalls {
+				if tc.Function.Name == "investigate_service" {
+					// Parse the service name from arguments
+					var args struct {
+						ServiceName string `json:"service_name"`
+					}
+					if err := json.Unmarshal([]byte(tc.Function.Arguments), &args); err == nil {
+						services = append(services, args.ServiceName)
+					}
+				}
+			}
+		}
+	}
+	return services
+}
+
+// extractInvestigationFindings extracts tool results from investigate_service calls
+func extractInvestigationFindings(messages []types.Message) []string {
+	var findings []string
+	for _, msg := range messages {
+		if msg.Role == types.RoleTool && msg.Name == "investigate_service" {
+			findings = append(findings, msg.Content)
+		}
+	}
+	return findings
 }
