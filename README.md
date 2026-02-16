@@ -6,29 +6,31 @@ A lightweight Go library for building AI agents that can interact with cloud inf
 
 Get your first agent running in **under 5 minutes**:
 
-### 1. Install the library (30 seconds)
+### 1. Clone and run an example (1 minute)
 
 ```bash
-go get github.com/oskarhane/goagent
+git clone https://github.com/oskarhane/goagent.git
+cd goagent
 ```
-
-### 2. Set up your environment and run (1 minute)
 
 Create a `.env` file with your API key:
 
 ```bash
-# For OpenAI
 OPENAI_API_KEY=sk-...
-
-# OR for Vertex AI
-GOOGLE_CLOUD_PROJECT=your-project-id
-GOOGLE_CLOUD_LOCATION=us-central1
 ```
 
-Then run an example:
+Run an example:
 
 ```bash
 export $(cat .env | xargs) && go run ./examples/agent-basic
+```
+
+### 2. Use in your own project
+
+```bash
+mkdir myagent && cd myagent
+go mod init myagent
+go get github.com/oskarhane/goagent
 ```
 
 ### 3. Create your first agent (3 minutes)
@@ -94,12 +96,11 @@ func main() {
 }
 ```
 
-### 4. Run it! (30 seconds)
+### 4. Run it!
 
 ```bash
-go mod init myagent
 go mod tidy
-go run main.go
+export $(cat .env | xargs) && go run main.go
 ```
 
 **That's it!** You now have a working AI agent that can make HTTP requests.
