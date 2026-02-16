@@ -120,8 +120,24 @@ Be systematic and thorough. Provide a clear incident summary with:
 	fmt.Println(incident)
 	fmt.Println()
 
+	// Start progress indicator
+	done := make(chan bool)
+	go func() {
+		for {
+			select {
+			case <-done:
+				return
+			default:
+				fmt.Print(".")
+				time.Sleep(500 * time.Millisecond)
+			}
+		}
+	}()
+
 	// Execute investigation
 	result := coordinator.Run(ctx, incident, nil)
+	done <- true
+	fmt.Println() // newline after dots
 
 	// Check for errors
 	if result.Error != nil {
