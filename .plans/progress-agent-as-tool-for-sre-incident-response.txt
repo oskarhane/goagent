@@ -80,3 +80,26 @@ Key Decisions:
 - Test coverage includes error cases but can't verify internal agent state (acceptable for unit tests)
 
 Next Task: task-005
+================================================================================
+TASK-005: Create agent-as-tool wrapper for investigator
+Date: 2026-02-16T19:45:00.000Z
+================================================================================
+
+Summary:
+Implemented core agent-as-tool pattern: wrapped investigator agent as callable tool for coordinator. Created investigate_service tool with Builder pattern, handler factory for agent execution, and comprehensive test suite with shared test helpers.
+
+Files Changed:
+- examples/incident-response/agent_tool.go (created - investigate_service tool definition and handler factory)
+- examples/incident-response/agent_tool_test.go (created - 6 tests covering tool creation, handler behavior, error propagation)
+- examples/incident-response/test_helpers.go (created - shared mockProvider to avoid duplication across test files)
+- examples/incident-response/investigator_test.go (modified - removed duplicate mockProvider, now uses test_helpers.go)
+
+Key Decisions:
+- Tool accepts service_name and incident_type params; both required
+- Handler creates investigator agent per request (no caching/reuse)
+- Inner agent errors propagate to outer agent via ToolResult.IsError=true
+- Output includes investigation result + stats (iterations, tokens, duration) for debugging
+- Shared mockProvider in test_helpers.go eliminates duplication while maintaining test isolation
+- Tool result serializes agent.RunResult as JSON for clean propagation
+
+Next Task: task-006

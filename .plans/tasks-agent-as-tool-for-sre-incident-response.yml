@@ -66,7 +66,7 @@ tasks:
     title: "Create agent-as-tool wrapper for investigator"
     description: |
       Implement the core pattern: wrap investigator agent as a tool callable by coordinator. Create investigate_service tool using tools.Builder with service_name and incident_type params. Handler runs inner agent with scoped context and returns agent response as ToolResult. Implement proper error propagation from inner agent.
-    status: pending
+    status: completed
     dependencies:
       - task-004
     acceptance_criteria:
@@ -75,7 +75,7 @@ tasks:
       - "Handler creates investigator agent with service scope"
       - "Handler runs agent.Run() and converts result to ToolResult"
       - "Inner agent errors propagate cleanly to outer agent"
-    completed_at: null
+    completed_at: 2026-02-16T19:45:00.000Z
 
   - id: task-006
     title: "Implement coordinator agent setup"

@@ -1,7 +1,6 @@
 package main
 
 import (
-	"context"
 	"testing"
 
 	"github.com/oskarhane/goagent/pkg/tools"
@@ -9,20 +8,6 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
-
-// mockProvider is a minimal mock provider for testing
-type mockProvider struct{}
-
-func (m *mockProvider) Name() string         { return "mock" }
-func (m *mockProvider) DefaultModel() string { return "mock-model" }
-func (m *mockProvider) Complete(ctx context.Context, req *types.CompletionRequest) (*types.CompletionResponse, error) {
-	return &types.CompletionResponse{
-		Message: types.Message{
-			Role:    types.RoleAssistant,
-			Content: "mock response",
-		},
-	}, nil
-}
 
 func TestNewInvestigator(t *testing.T) {
 	provider := &mockProvider{}
