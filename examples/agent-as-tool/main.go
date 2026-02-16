@@ -29,10 +29,10 @@ func main() {
 		log.Fatal("OPENAI_API_KEY environment variable is required")
 	}
 
-	// Create OpenAI provider with gpt-5-mini for faster responses
+	// Create OpenAI provider with gpt-5.1 for complex reasoning
 	provider, err := openai.NewProvider(&openai.Config{
 		APIKey: apiKey,
-		Model:  "gpt-5-mini",
+		Model:  "gpt-5.1",
 	})
 	if err != nil {
 		log.Fatalf("Failed to create OpenAI provider: %v", err)
@@ -87,14 +87,11 @@ Be systematic and thorough. Provide a clear incident summary with:
 - Evidence supporting your conclusion
 - Recommended remediation steps`
 
-	// gpt-5-mini only supports temperature=1.0
-	defaultTemp := 1.0
 	coordinatorConfig := &agent.Config{
 		Provider:      provider,
 		SystemPrompt:  coordinatorPrompt,
 		Registry:      coordinatorRegistry,
 		MaxIterations: 10,
-		Temperature:   &defaultTemp,
 		Logger:        l,
 	}
 
