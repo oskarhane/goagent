@@ -1,3 +1,3 @@
 module github.com/oskarhane/goagent
 
-go 1.26
+go 1.25
