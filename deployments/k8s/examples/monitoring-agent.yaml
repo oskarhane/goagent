@@ -1,0 +1,99 @@
+# Example: Kubernetes Monitoring Agent
+# This example deploys an agent that monitors cluster health and reports issues
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: monitoring-agent-config
+  labels:
+    app: monitoring-agent
+data:
+  log_level: "info"
+  max_iterations: "15"
+  timeout: "300"
+  # Agent prompt/task
+  agent_task: |
+    Monitor the Kubernetes cluster and report on:
+    1. Pods that are not in Running state
+    2. Services with no endpoints
+    3. Deployments with unavailable replicas
+    4. Nodes that are not Ready
+    Provide a summary of cluster health.
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: monitoring-agent
+  labels:
+    app: monitoring-agent
+spec:
+  # Run every 15 minutes
+  schedule: "*/15 * * * *"
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 5
+  failedJobsHistoryLimit: 5
+  jobTemplate:
+    spec:
+      backoffLimit: 2
+      activeDeadlineSeconds: 600
+      template:
+        metadata:
+          labels:
+            app: monitoring-agent
+        spec:
+          serviceAccountName: goagent
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 1000
+            fsGroup: 1000
+          containers:
+          - name: agent
+            image: goagent:latest
+            imagePullPolicy: IfNotPresent
+            command: ["--help"]  # Replace with monitoring task command
+            env:
+            - name: LOG_LEVEL
+              valueFrom:
+                configMapKeyRef:
+                  name: monitoring-agent-config
+                  key: log_level
+            - name: MAX_ITERATIONS
+              valueFrom:
+                configMapKeyRef:
+                  name: monitoring-agent-config
+                  key: max_iterations
+            - name: TIMEOUT
+              valueFrom:
+                configMapKeyRef:
+                  name: monitoring-agent-config
+                  key: timeout
+            - name: OPENAI_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: goagent-secrets
+                  key: openai_api_key
+            - name: AGENT_TASK
+              valueFrom:
+                configMapKeyRef:
+                  name: monitoring-agent-config
+                  key: agent_task
+            resources:
+              requests:
+                cpu: 100m
+                memory: 128Mi
+              limits:
+                cpu: 500m
+                memory: 256Mi
+            securityContext:
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: true
+              runAsNonRoot: true
+              capabilities:
+                drop:
+                - ALL
+            volumeMounts:
+            - name: tmp
+              mountPath: /tmp
+          volumes:
+          - name: tmp
+            emptyDir: {}
+          restartPolicy: OnFailure

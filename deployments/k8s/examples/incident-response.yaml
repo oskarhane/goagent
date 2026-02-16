@@ -1,0 +1,80 @@
+# Example: Incident Response Agent
+# This example deploys an agent that investigates and diagnoses incidents
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: incident-agent
+  labels:
+    app: incident-agent
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: incident-agent
+  template:
+    metadata:
+      labels:
+        app: incident-agent
+    spec:
+      serviceAccountName: goagent
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        fsGroup: 1000
+      containers:
+      - name: agent
+        image: goagent:latest
+        imagePullPolicy: IfNotPresent
+        command: ["--help"]  # Replace with incident response service
+        env:
+        - name: LOG_LEVEL
+          value: "debug"
+        - name: MAX_ITERATIONS
+          value: "20"
+        - name: TIMEOUT
+          value: "600"
+        - name: OPENAI_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: goagent-secrets
+              key: openai_api_key
+        - name: OPENAI_MODEL
+          value: "gpt-4-turbo-preview"
+        ports:
+        - name: http
+          containerPort: 8080
+        resources:
+          requests:
+            cpu: 200m
+            memory: 256Mi
+          limits:
+            cpu: 1000m
+            memory: 512Mi
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          runAsNonRoot: true
+          capabilities:
+            drop:
+            - ALL
+        volumeMounts:
+        - name: tmp
+          mountPath: /tmp
+      volumes:
+      - name: tmp
+        emptyDir: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: incident-agent
+  labels:
+    app: incident-agent
+spec:
+  type: ClusterIP
+  ports:
+  - port: 8080
+    targetPort: http
+    name: http
+  selector:
+    app: incident-agent

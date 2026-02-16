@@ -1,0 +1,107 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: goagent-scheduled
+  labels:
+    app: goagent
+    component: cronjob
+spec:
+  # Run every hour at minute 0
+  schedule: "0 * * * *"
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    metadata:
+      labels:
+        app: goagent
+        component: cronjob
+    spec:
+      backoffLimit: 2
+      activeDeadlineSeconds: 600  # 10 minutes max execution time
+      template:
+        metadata:
+          labels:
+            app: goagent
+            component: cronjob
+          annotations:
+            prometheus.io/scrape: "false"
+        spec:
+          serviceAccountName: goagent
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 1000
+            fsGroup: 1000
+            seccompProfile:
+              type: RuntimeDefault
+          containers:
+          - name: goagent
+            image: goagent:latest
+            imagePullPolicy: IfNotPresent
+            command: ["--help"]  # Replace with actual agent task when service mode implemented
+            env:
+            - name: LOG_LEVEL
+              valueFrom:
+                configMapKeyRef:
+                  name: goagent-config
+                  key: log_level
+            - name: MAX_ITERATIONS
+              valueFrom:
+                configMapKeyRef:
+                  name: goagent-config
+                  key: max_iterations
+            - name: TIMEOUT
+              valueFrom:
+                configMapKeyRef:
+                  name: goagent-config
+                  key: timeout
+            - name: OPENAI_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: goagent-secrets
+                  key: openai_api_key
+                  optional: true
+            - name: GOOGLE_APPLICATION_CREDENTIALS
+              value: /var/secrets/google/key.json
+            - name: GOOGLE_CLOUD_PROJECT
+              valueFrom:
+                secretKeyRef:
+                  name: goagent-secrets
+                  key: google_project_id
+                  optional: true
+            - name: ENABLE_TRACING
+              value: "false"
+            - name: JOB_MODE
+              value: "cronjob"
+            resources:
+              requests:
+                cpu: 100m
+                memory: 128Mi
+              limits:
+                cpu: 500m
+                memory: 256Mi
+            securityContext:
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: true
+              runAsNonRoot: true
+              runAsUser: 1000
+              capabilities:
+                drop:
+                - ALL
+            volumeMounts:
+            - name: tmp
+              mountPath: /tmp
+            - name: google-credentials
+              mountPath: /var/secrets/google
+              readOnly: true
+          volumes:
+          - name: tmp
+            emptyDir: {}
+          - name: google-credentials
+            secret:
+              secretName: goagent-secrets
+              items:
+              - key: google_credentials
+                path: key.json
+              optional: true
+          restartPolicy: OnFailure

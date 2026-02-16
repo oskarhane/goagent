@@ -1,0 +1,139 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: goagent
+  labels:
+    app: goagent
+    component: agent
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: goagent
+  template:
+    metadata:
+      labels:
+        app: goagent
+        component: agent
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8080"
+        prometheus.io/path: "/metrics"
+    spec:
+      serviceAccountName: goagent
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        fsGroup: 1000
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+      - name: goagent
+        image: goagent:latest
+        imagePullPolicy: IfNotPresent
+        command: ["--help"]  # Replace with actual agent command when service mode implemented
+        env:
+        - name: LOG_LEVEL
+          valueFrom:
+            configMapKeyRef:
+              name: goagent-config
+              key: log_level
+        - name: MAX_ITERATIONS
+          valueFrom:
+            configMapKeyRef:
+              name: goagent-config
+              key: max_iterations
+        - name: TIMEOUT
+          valueFrom:
+            configMapKeyRef:
+              name: goagent-config
+              key: timeout
+        - name: OPENAI_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: goagent-secrets
+              key: openai_api_key
+              optional: true
+        - name: GOOGLE_APPLICATION_CREDENTIALS
+          value: /var/secrets/google/key.json
+        - name: GOOGLE_CLOUD_PROJECT
+          valueFrom:
+            secretKeyRef:
+              name: goagent-secrets
+              key: google_project_id
+              optional: true
+        - name: ENABLE_TRACING
+          value: "false"
+        - name: OTEL_EXPORTER_OTLP_ENDPOINT
+          value: "http://otel-collector:4318"
+        ports:
+        - name: http
+          containerPort: 8080
+          protocol: TCP
+        livenessProbe:
+          exec:
+            command:
+            - /app/goagent
+            - --version
+          initialDelaySeconds: 10
+          periodSeconds: 30
+          timeoutSeconds: 5
+          failureThreshold: 3
+        readinessProbe:
+          exec:
+            command:
+            - /app/goagent
+            - --version
+          initialDelaySeconds: 5
+          periodSeconds: 10
+          timeoutSeconds: 3
+          failureThreshold: 3
+        resources:
+          requests:
+            cpu: 100m
+            memory: 128Mi
+          limits:
+            cpu: 1000m
+            memory: 512Mi
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          runAsNonRoot: true
+          runAsUser: 1000
+          capabilities:
+            drop:
+            - ALL
+        volumeMounts:
+        - name: tmp
+          mountPath: /tmp
+        - name: google-credentials
+          mountPath: /var/secrets/google
+          readOnly: true
+      volumes:
+      - name: tmp
+        emptyDir: {}
+      - name: google-credentials
+        secret:
+          secretName: goagent-secrets
+          items:
+          - key: google_credentials
+            path: key.json
+          optional: true
+      restartPolicy: Always
+      terminationGracePeriodSeconds: 30
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: goagent
+  labels:
+    app: goagent
+spec:
+  type: ClusterIP
+  ports:
+  - port: 8080
+    targetPort: http
+    protocol: TCP
+    name: http
+  selector:
+    app: goagent

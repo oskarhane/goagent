@@ -107,3 +107,32 @@
 - **Registry pattern**: tools.NewRegistry() + registry.MustRegister(tool, handler) is correct setup
 - **Example completeness**: Include .env.example files, READMEs, go.mod for each example
 - **Godotenv pattern**: Use _ "github.com/joho/godotenv/autoload" for easy .env loading in examples
+
+## Testing
+
+- **Test framework**: Use testify/assert and testify/require for assertions
+- **Mock providers**: Create simple mock providers implementing types.Provider interface for agent testing
+- **Test structure**: Organize tests with table-driven tests for parameter validation
+- **Coverage focus**: Prioritize core logic (types, agent, tools) over provider implementations
+- **HTTP testing**: Use httptest.NewServer for testing HTTP tool without external dependencies
+- **JSON assertions**: JSON marshaling may not include spaces; use Contains for partial matching
+- **Context cancellation**: Test context cancellation but allow 1 iteration before check (agent checks at loop start)
+- **Builder API**: Test builder pattern ensures proper JSON Schema structure with properties and required arrays
+- **Thread safety**: Test concurrent tool execution and logging to verify mutex usage
+
+## Testing
+
+- **Test framework**: Use testify/assert and testify/require for assertions
+- **Mock providers**: Create simple mock providers implementing types.Provider interface for agent testing
+- **Test structure**: Organize tests with table-driven tests for parameter validation
+- **Coverage focus**: Prioritize core logic (types, agent, tools) over provider implementations
+- **HTTP testing**: Use httptest.NewServer for testing HTTP tool without external dependencies
+- **JSON assertions**: JSON marshaling may not include spaces; use Contains for partial matching
+- **Context cancellation**: Test context cancellation but allow 1 iteration before check (agent checks at loop start)
+- **Builder API**: Test builder pattern ensures proper JSON Schema structure with properties and required arrays
+- **Thread safety**: Test concurrent tool execution and logging to verify mutex usage
+- **Provider mocking**: Use httptest for provider tests; mock server routes requests properly
+- **Error assertions**: Use flexible checks (Contains/True) for error messages that vary by implementation
+- **Shell tests**: Use safe commands only (echo, pwd, ls); avoid platform-specific behavior
+- **Flaky tests**: Skip timing-sensitive tests (context cancel) that can't be made deterministic
+- **Lint compliance**: Fix unused params with `_`, add missing imports, split long lines, use American spelling

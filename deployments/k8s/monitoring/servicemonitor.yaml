@@ -1,0 +1,18 @@
+# ServiceMonitor for Prometheus Operator
+# This requires the Prometheus Operator to be installed in your cluster
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: goagent
+  labels:
+    app: goagent
+    prometheus: kube-prometheus
+spec:
+  selector:
+    matchLabels:
+      app: goagent
+  endpoints:
+  - port: http
+    path: /metrics
+    interval: 30s
+    scrapeTimeout: 10s

@@ -1,0 +1,28 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: goagent-config
+  labels:
+    app: goagent
+data:
+  # Logging configuration
+  log_level: "info"
+  
+  # Agent configuration
+  max_iterations: "10"
+  timeout: "300"
+  
+  # OpenAI provider defaults (if not set in secrets)
+  openai_model: "gpt-4-turbo-preview"
+  
+  # Vertex AI provider defaults (if not set in secrets)
+  vertex_model: "gemini-1.5-pro"
+  vertex_location: "us-central1"
+  
+  # Tool configuration
+  http_tool_timeout: "30"
+  http_tool_max_response_size: "10485760"  # 10MB
+  shell_tool_timeout: "300"
+  shell_tool_max_output_size: "1048576"   # 1MB
+  k8s_tool_timeout: "60"
+  k8s_tool_namespace: "default"
