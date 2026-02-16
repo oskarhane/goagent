@@ -38,3 +38,23 @@ Key Decisions:
 - Context parameter captured but not checked in handlers (acceptable for lightweight mocks)
 
 Next Task: task-003
+================================================================================
+TASK-003: Create incident scenarios with cascading failures
+Date: 2026-02-16T16:10:37.000Z
+================================================================================
+
+Summary:
+Implemented Scenario and Scenarios structs with 3 distinct incident types: cascading failure (database→auth→api), memory leak, and dependency failure. Created factory functions, getters, and helper methods for incident description formatting.
+
+Files Changed:
+- examples/agent-as-tool/scenarios.go (created - scenario data structures, factory, getters with error handling)
+- examples/agent-as-tool/scenarios_test.go (created - 15 tests covering factory, getters, defaults, alignment with mock data)
+
+Key Decisions:
+- Used Scenario struct with Name/IncidentType/InitialReport/AffectedServices/RootCause/Description for rich scenario data
+- Scenarios container struct with slice of scenarios; factory always populates 3 scenarios
+- Added panic protection in Default() method for empty scenarios slice
+- Helper methods GetIncidentDescription() and GetExpectedServices() facilitate coordinator/investigator integration
+- Mock data alignment test ensures scenarios and mocks use consistent service names
+
+Next Task: task-004

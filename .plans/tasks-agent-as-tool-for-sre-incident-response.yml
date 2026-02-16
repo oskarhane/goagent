@@ -36,7 +36,7 @@ tasks:
     title: "Create incident scenarios with cascading failures"
     description: |
       Implement scenarios.go with pre-built incident scenarios demonstrating cascading failures (auth → api → user-facing errors). Include scenario data structures and factory functions that return incident descriptions and expected mock data for services: api-service, database, cache, auth-service.
-    status: pending
+    status: completed
     dependencies:
       - task-002
     acceptance_criteria:
@@ -45,7 +45,7 @@ tasks:
       - "Factory functions return incident descriptions"
       - "Mock data aligned with scenarios"
       - "At least 2-3 distinct scenarios available"
-    completed_at: null
+    completed_at: 2026-02-16T16:10:37.000Z
 
   - id: task-004
     title: "Implement investigator agent factory"
