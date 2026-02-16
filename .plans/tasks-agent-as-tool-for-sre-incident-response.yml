@@ -1,0 +1,159 @@
+feature: agent-as-tool-for-sre-incident-response
+prd: ./prd-agent-as-tool-for-sre-incident-response.md
+created_at: 2026-02-16T16:00:20.720Z
+updated_at: 2026-02-16T16:00:20.720Z
+
+tasks:
+  - id: task-001
+    title: "Create agent-as-tool example directory structure"
+    description: |
+      Initialize examples/agent-as-tool/ with standard Go module structure. Create go.mod, go.sum, .env.example with OPENAI_API_KEY placeholder, and README.md skeleton. Follow patterns from examples/incident-response and examples/tools-basic.
+    status: pending
+    dependencies: []
+    acceptance_criteria:
+      - "Directory examples/agent-as-tool/ exists"
+      - "go.mod with module name and dependencies created"
+      - ".env.example contains OPENAI_API_KEY"
+      - "README.md contains basic structure"
+    completed_at: null
+
+  - id: task-002
+    title: "Implement mock tools for SRE diagnostics"
+    description: |
+      Create mocks.go with three mock tool implementations: mock_logs (returns simulated log entries), mock_metrics (returns time-series data), and mock_service_status (returns health check results). Tools must be scoped by service name parameter and return realistic, deterministic data for demo purposes.
+    status: pending
+    dependencies:
+      - task-001
+    acceptance_criteria:
+      - "mock_logs tool with service_name param returns realistic log entries"
+      - "mock_metrics tool returns time-series format data"
+      - "mock_service_status returns health check JSON"
+      - "All tools use tools.Builder pattern"
+      - "Data is deterministic for reproducible demos"
+    completed_at: null
+
+  - id: task-003
+    title: "Create incident scenarios with cascading failures"
+    description: |
+      Implement scenarios.go with pre-built incident scenarios demonstrating cascading failures (auth → api → user-facing errors). Include scenario data structures and factory functions that return incident descriptions and expected mock data for services: api-service, database, cache, auth-service.
+    status: pending
+    dependencies:
+      - task-002
+    acceptance_criteria:
+      - "Scenarios struct with multiple incident types defined"
+      - "Cascading failure scenario (auth→api→user errors) implemented"
+      - "Factory functions return incident descriptions"
+      - "Mock data aligned with scenarios"
+      - "At least 2-3 distinct scenarios available"
+    completed_at: null
+
+  - id: task-004
+    title: "Implement investigator agent factory"
+    description: |
+      Create investigator.go with NewInvestigator() function that returns an agent configured for service-level investigation. Agent should have dynamic system prompt including service name, access to mock tools (logs, metrics, status), and max 5 iterations. Follow agent.NewAgent patterns from pkg/agent.
+    status: pending
+    dependencies:
+      - task-002
+    acceptance_criteria:
+      - "NewInvestigator(serviceName, registry) function created"
+      - "System prompt dynamically includes service name"
+      - "Agent configured with mock tools registry"
+      - "Max iterations set to 5"
+      - "Returns *agent.Agent and error"
+    completed_at: null
+
+  - id: task-005
+    title: "Create agent-as-tool wrapper for investigator"
+    description: |
+      Implement the core pattern: wrap investigator agent as a tool callable by coordinator. Create investigate_service tool using tools.Builder with service_name and incident_type params. Handler runs inner agent with scoped context and returns agent response as ToolResult. Implement proper error propagation from inner agent.
+    status: pending
+    dependencies:
+      - task-004
+    acceptance_criteria:
+      - "investigate_service tool created with Builder pattern"
+      - "Handler parses service_name and incident_type params"
+      - "Handler creates investigator agent with service scope"
+      - "Handler runs agent.Run() and converts result to ToolResult"
+      - "Inner agent errors propagate cleanly to outer agent"
+    completed_at: null
+
+  - id: task-006
+    title: "Implement coordinator agent setup"
+    description: |
+      Create main.go with coordinator agent configuration. Coordinator has system prompt for SRE triage/routing, access to investigate_service tool (wrapping investigator), and max 10 iterations. Use openai.NewProvider with gpt-5.1 model. Include logger setup with debug mode via DEBUG env var.
+    status: pending
+    dependencies:
+      - task-005
+    acceptance_criteria:
+      - "main.go initializes OpenAI provider with API key from env"
+      - "Coordinator agent created with triage system prompt"
+      - "investigate_service tool registered to coordinator"
+      - "Logger configured with Info/Debug levels"
+      - "Max iterations set to 10"
+    completed_at: null
+
+  - id: task-007
+    title: "Implement main execution flow and output formatting"
+    description: |
+      Complete main.go with incident execution flow. Accept incident description from command line args or use default scenario. Run coordinator agent, format output showing delegation hierarchy, tool execution, and investigation findings. Print execution stats (iterations, tokens, duration).
+    status: pending
+    dependencies:
+      - task-006
+      - task-003
+    acceptance_criteria:
+      - "Accepts incident from os.Args or uses default"
+      - "Runs coordinator with agent.Run()"
+      - "Output shows agent hierarchy clearly"
+      - "Displays investigation findings from both agents"
+      - "Prints stats: iterations, tokens, duration"
+      - "Completes execution within 60 seconds"
+    completed_at: null
+
+  - id: task-008
+    title: "Write comprehensive README with architecture"
+    description: |
+      Document the agent-as-tool pattern in README.md. Include architecture diagram (ASCII or description), quickstart instructions, explanation of hierarchical delegation, code walkthrough, and example output. Document when to use this pattern vs single agent. Follow READMEs from other examples.
+    status: pending
+    dependencies:
+      - task-007
+    acceptance_criteria:
+      - "Architecture diagram showing coordinator→investigator flow"
+      - "Quickstart with prerequisites and run commands"
+      - "Pattern explanation: when to use hierarchical agents"
+      - "Code walkthrough of key components"
+      - "Example output showing delegation"
+      - "Following markdown format from other examples"
+    completed_at: null
+
+  - id: task-009
+    title: "Add integration test for agent-as-tool example"
+    description: |
+      Create main_test.go with integration test that verifies coordinator delegates to investigator. Use mock provider or test against real OpenAI with small max iterations. Test that mock tools execute correctly and investigator results return to coordinator. Verify error handling.
+    status: pending
+    dependencies:
+      - task-007
+    acceptance_criteria:
+      - "main_test.go with TestAgentAsTool function"
+      - "Test verifies delegation occurs (investigator called)"
+      - "Mock tools execute without errors"
+      - "Tool results propagate correctly"
+      - "Test passes with go test ./..."
+      - "Uses testify/assert for assertions"
+    completed_at: null
+
+  - id: task-010
+    title: "Verify example compiles and runs end-to-end"
+    description: |
+      Run full build and execution verification. Ensure go build succeeds, example runs with only OPENAI_API_KEY env var, completes within 60s, and produces expected output showing hierarchical delegation. Test with DEBUG=true for detailed logging. Update AGENTS.md with learnings.
+    status: pending
+    dependencies:
+      - task-008
+      - task-009
+    acceptance_criteria:
+      - "go build ./... succeeds without errors"
+      - "Example runs with only OPENAI_API_KEY set"
+      - "Execution completes in <60 seconds"
+      - "Output clearly shows coordinator→investigator delegation"
+      - "DEBUG=true produces detailed logs"
+      - "All acceptance criteria from PRD verified"
+    completed_at: null
