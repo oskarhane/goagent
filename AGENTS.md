@@ -99,3 +99,11 @@
 - **Observability**: Include Prometheus annotations and optional ServiceMonitor/PodMonitor
 - **PodMonitor caveat**: CronJobs don't expose metrics endpoints by default; PodMonitor for future push-based metrics
 - **Examples**: Provide working examples for common patterns (monitoring, incident response)
+
+## Documentation
+
+- **Quickstart accuracy**: Verify code examples compile; common mistakes: tools.Handler vs *tools.Registry type mismatch
+- **Return values**: agent.Run() returns *RunResult (no error tuple); check result.Error not err
+- **Registry pattern**: tools.NewRegistry() + registry.MustRegister(tool, handler) is correct setup
+- **Example completeness**: Include .env.example files, READMEs, go.mod for each example
+- **Godotenv pattern**: Use _ "github.com/joho/godotenv/autoload" for easy .env loading in examples

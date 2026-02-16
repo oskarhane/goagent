@@ -402,3 +402,34 @@ Key Decisions:
 - Examples: monitoring-agent (every 5min), incident-response (on-demand) show real-world patterns
 
 Next Task: task-014
+================================================================================
+TASK-014: Write comprehensive documentation and examples
+Date: 2026-02-16T13:04:54.000Z
+================================================================================
+
+Summary:
+Created comprehensive README with 4-step quickstart (<5 min), API docs for providers/tools/agent, two working examples (k8s-monitoring, incident-response) with READMEs and .env.example files. Fixed critical bugs in quickstart code during finalization (tools.Registry type mismatch, Run() return value handling).
+
+Files Changed:
+- README.md (created) - Comprehensive guide with quickstart, API docs, examples, FAQ
+- examples/k8s-monitoring/main.go (created) - Kubernetes monitoring agent with pod health checks
+- examples/k8s-monitoring/README.md (created) - Setup and usage guide
+- examples/k8s-monitoring/.env.example (created) - Environment variables template
+- examples/k8s-monitoring/go.mod (created) - Module file
+- examples/incident-response/main.go (created) - Incident response agent with HTTP tool
+- examples/incident-response/README.md (created) - Setup and usage guide
+- examples/incident-response/.env.example (created) - Environment variables template
+- examples/incident-response/go.mod (created) - Module file
+- Makefile (modified) - Added examples-k8s, examples-incident targets
+
+Key Decisions:
+- Quickstart uses autoload godotenv pattern for easy .env setup
+- Both examples demonstrate proper error handling and structured logging
+- K8s monitoring example queries pod status every 30s with history limiting
+- Incident response example uses HTTP tool to fetch site status
+- README includes troubleshooting sections for common issues
+- Fixed registry creation: tools.NewRegistry() + registry.MustRegister() pattern
+- Fixed Run() call: returns *RunResult (check result.Error, not err tuple)
+
+Next Task: task-015
+

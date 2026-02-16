@@ -108,6 +108,51 @@ docker-compose-down: ## Stop Docker Compose services
 docker-compose-logs: ## View Docker Compose logs
 	@cd deployments/docker && docker-compose logs -f
 
+# Kubernetes
+k8s-validate: ## Validate Kubernetes manifests
+	@echo "Validating Kubernetes manifests..."
+	@python3 -c "import yaml; [list(yaml.safe_load_all(open(f))) for f in ['deployments/k8s/base/configmap.yaml', 'deployments/k8s/base/cronjob.yaml', 'deployments/k8s/base/deployment.yaml', 'deployments/k8s/base/rbac.yaml', 'deployments/k8s/base/secret.yaml']]" && echo "✓ All manifests valid"
+
+k8s-apply-base: ## Apply base Kubernetes manifests
+	@echo "Applying base Kubernetes manifests..."
+	@kubectl apply -f deployments/k8s/base/rbac.yaml
+	@kubectl apply -f deployments/k8s/base/configmap.yaml
+	@kubectl apply -f deployments/k8s/base/secret.yaml
+	@echo "Base manifests applied!"
+
+k8s-apply-deployment: ## Apply Deployment (service mode)
+	@echo "Applying Deployment..."
+	@kubectl apply -f deployments/k8s/base/deployment.yaml
+	@echo "Deployment applied!"
+
+k8s-apply-cronjob: ## Apply CronJob (scheduled mode)
+	@echo "Applying CronJob..."
+	@kubectl apply -f deployments/k8s/base/cronjob.yaml
+	@echo "CronJob applied!"
+
+k8s-apply-monitoring: ## Apply monitoring manifests
+	@echo "Applying monitoring manifests..."
+	@kubectl apply -f deployments/k8s/monitoring/
+	@echo "Monitoring manifests applied!"
+
+k8s-delete: ## Delete all Kubernetes resources
+	@echo "Deleting Kubernetes resources..."
+	@kubectl delete -f deployments/k8s/base/ --ignore-not-found=true
+	@echo "Resources deleted!"
+
+k8s-logs: ## View logs from goagent pods
+	@kubectl logs -l app=goagent -f
+
+k8s-status: ## Check status of goagent resources
+	@echo "GoAgent Resources:"
+	@kubectl get all -l app=goagent
+	@echo ""
+	@echo "Secrets:"
+	@kubectl get secret goagent-secrets
+	@echo ""
+	@echo "ConfigMaps:"
+	@kubectl get configmap goagent-config
+
 # Development workflow
 dev: fmt lint test build ## Run development workflow (fmt, lint, test, build)
 	@echo "Development workflow complete!"

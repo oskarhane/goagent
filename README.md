@@ -4,81 +4,342 @@ A lightweight Go library for building AI agents that can interact with cloud inf
 
 ## Quick Start
 
-Get your first agent running in under 5 minutes:
+Get your first agent running in **under 5 minutes**:
 
-```bash
-# Install the CLI
-go install github.com/oskarhane/goagent/cmd/goagent@latest
-
-# Run your first agent
-goagent --help
-```
-
-## Features
-
-- **🚀 Rapid Development**: Zero to agent in under 5 minutes
-- **🔧 Built-in Tools**: HTTP requests, shell execution, Kubernetes queries
-- **🤖 Multi-Provider**: OpenAI and Vertex AI support
-- **☁️ Cloud-Native**: Kubernetes-ready with RBAC templates
-- **📊 Observability**: Structured logging and OpenTelemetry tracing
-- **🛡️ Production-Ready**: Rate limiting, timeouts, and safety constraints
-
-## Installation
-
-### CLI Tool
-
-```bash
-go install github.com/oskarhane/goagent/cmd/goagent@latest
-```
-
-### As a Library
+### 1. Install the library (30 seconds)
 
 ```bash
 go get github.com/oskarhane/goagent
 ```
 
-## Basic Usage
+### 2. Set up your environment (1 minute)
 
-### Simple Agent
+Create a `.env` file with your API key:
+
+```bash
+# For OpenAI
+OPENAI_API_KEY=sk-...
+
+# OR for Vertex AI
+GOOGLE_CLOUD_PROJECT=your-project-id
+GOOGLE_CLOUD_LOCATION=us-central1
+```
+
+### 3. Create your first agent (3 minutes)
+
+Create `main.go`:
 
 ```go
 package main
 
 import (
     "context"
+    "fmt"
     "log"
+    "os"
     
+    _ "github.com/joho/godotenv/autoload" // Auto-load .env file
     "github.com/oskarhane/goagent/pkg/agent"
     "github.com/oskarhane/goagent/pkg/providers/openai"
+    "github.com/oskarhane/goagent/pkg/tools"
+    "github.com/oskarhane/goagent/pkg/tools/http"
 )
 
 func main() {
-    // Create a provider
-    provider := openai.New("your-api-key")
-    
-    // Create an agent
-    a := agent.New(provider).
-        WithSystemPrompt("You are a helpful cloud monitoring assistant")
-    
-    // Run the agent
-    result, err := a.Run(context.Background(), "Check the status of our production pods")
+    // Create provider
+    provider, err := openai.NewProvider(&openai.Config{
+        APIKey: os.Getenv("OPENAI_API_KEY"),
+    })
     if err != nil {
         log.Fatal(err)
     }
     
-    fmt.Println(result.Message)
+    // Create agent with HTTP tool
+    registry := tools.NewRegistry()
+    httpTool := http.NewTool()
+    httpHandler := http.NewHandler(nil)
+    registry.MustRegister(httpTool, httpHandler)
+    
+    cfg := &agent.Config{
+        Provider:      provider,
+        SystemPrompt:  "You are a helpful assistant that can make HTTP requests.",
+        Registry:      registry,
+        MaxIterations: 10,
+    }
+    
+    a, err := agent.NewAgent(cfg)
+    if err != nil {
+        log.Fatal(err)
+    }
+    
+    // Run agent
+    ctx := context.Background()
+    result := a.Run(ctx, "Get the current weather from wttr.in/London", nil)
+    if result.Error != nil {
+        log.Fatal(result.Error)
+    }
+    
+    // Print final response
+    for _, msg := range result.Messages {
+        if msg.Role == "assistant" && len(msg.ToolCalls) == 0 {
+            fmt.Println("Agent:", msg.Content)
+        }
+    }
 }
 ```
 
-### Agent with Custom Tools
+### 4. Run it! (30 seconds)
+
+```bash
+go mod init myagent
+go mod tidy
+go run main.go
+```
+
+**That's it!** You now have a working AI agent that can make HTTP requests.
+
+## Features
+
+- **Rapid Development**: Zero to agent in under 5 minutes
+- **Built-in Tools**: HTTP requests, shell execution, Kubernetes queries
+- **Multi-Provider**: OpenAI and Vertex AI support
+- **Cloud-Native**: Kubernetes-ready with RBAC templates
+- **Observability**: Structured logging and OpenTelemetry tracing
+- **Production-Ready**: Rate limiting, timeouts, and safety constraints
+
+## Core Concepts
+
+### Providers
+
+Providers are LLM backends. GoAgent supports:
+
+- **OpenAI**: GPT-4, GPT-3.5-turbo
+- **Vertex AI**: Gemini Pro, Gemini Pro Vision
 
 ```go
-// Add custom tools to your agent
-a := agent.New(provider).
-    WithTool(tools.HTTP()).
-    WithTool(tools.K8s()).
-    WithTool(myCustomTool)
+// OpenAI
+provider, _ := openai.NewProvider(&openai.Config{
+    APIKey: os.Getenv("OPENAI_API_KEY"),
+    Model:  "gpt-4-turbo-preview",
+})
+
+// Vertex AI
+provider, _ := vertex.NewProvider(&vertex.Config{
+    ProjectID: os.Getenv("GOOGLE_CLOUD_PROJECT"),
+    Location:  os.Getenv("GOOGLE_CLOUD_LOCATION"),
+    Model:     "gemini-1.5-pro",
+})
 ```
+
+### Tools
+
+Tools give agents capabilities. Built-in tools:
+
+```go
+import (
+    "github.com/oskarhane/goagent/pkg/tools/http"
+    "github.com/oskarhane/goagent/pkg/tools/shell"
+    "github.com/oskarhane/goagent/pkg/tools/k8s"
+)
+
+// HTTP requests
+httpRegistry := http.NewHandler(nil)
+
+// Shell commands (with safety constraints)
+shellRegistry := shell.NewHandler(&shell.Config{
+    AllowedCommands: []string{"ls", "ps", "df"},
+    Timeout:         time.Minute * 5,
+})
+
+// Kubernetes queries
+k8sRegistry := k8s.NewHandler(&k8s.Config{
+    KubeconfigPath: os.Getenv("KUBECONFIG"),
+})
+```
+
+### Agent
+
+The agent orchestrates reasoning and tool execution:
+
+```go
+cfg := &agent.Config{
+    Provider:      provider,
+    SystemPrompt:  "You are a cloud monitoring assistant.",
+    Registry:      registry,
+    MaxIterations: 10,  // Safety limit
+    Temperature:   &temp, // 0.0-1.0
+    Logger:        logger,
+}
+
+a, _ := agent.NewAgent(cfg)
+result, _ := a.Run(ctx, "Check system health", nil)
+```
+
+## Examples
+
+### Kubernetes Monitoring
+
+Monitor cluster health and report issues:
+
+```bash
+cd examples/k8s-monitoring
+go run main.go
+```
+
+See [examples/k8s-monitoring/](examples/k8s-monitoring/) for full code.
+
+### Incident Response
+
+Investigate and diagnose incidents:
+
+```bash
+cd examples/incident-response
+go run main.go
+```
+
+See [examples/incident-response/](examples/incident-response/) for full code.
+
+### More Examples
+
+- [Agent basics](examples/agent-basic/) - Simple agent with tools
+- [HTTP tool](examples/http-tool/) - Making API requests
+- [Shell tool](examples/shell-tool/) - Executing commands
+- [K8s tool](examples/k8s-tool/) - Querying clusters
+- [Conversation history](examples/conversation-history/) - Multi-turn conversations
+- [Logging](examples/logging-basic/) - Structured logging
+
+## Creating Custom Tools
+
+Define custom tools using the builder API:
+
+```go
+import "github.com/oskarhane/goagent/pkg/tools"
+
+func MyCustomTool() *types.Tool {
+    return tools.NewBuilder("my_tool", "Describes what my tool does").
+        StringParam("input", "Description of the input", true).
+        Build(func(ctx context.Context, params map[string]any) (any, error) {
+            input := params["input"].(string)
+            
+            // Your logic here
+            result := process(input)
+            
+            return result, nil
+        })
+}
+
+// Use it
+registry := tools.NewRegistry()
+registry.Register(MyCustomTool())
+
+cfg := &agent.Config{
+    Provider: provider,
+    Registry: registry,
+    // ...
+}
+```
+
+## Conversation History
+
+Maintain context across multiple interactions:
+
+```go
+var history []types.Message
+
+// First interaction
+result1, _ := a.Run(ctx, "What's 5 + 3?", nil)
+history = result1.Messages
+
+// Second interaction (with context)
+opts := &agent.RunOptions{
+    History: history,
+}
+result2, _ := a.Run(ctx, "Multiply that by 2", opts)
+history = result2.Messages
+```
+
+## Deployment
+
+### Docker
+
+Build and run as a container:
+
+```bash
+docker build -t myagent .
+docker run -e OPENAI_API_KEY=sk-... myagent
+```
+
+See [deployments/docker/](deployments/docker/) for service and cronjob variants.
+
+### Kubernetes
+
+Deploy as a service or cronjob:
+
+```bash
+# Apply RBAC
+kubectl apply -f deployments/k8s/base/rbac.yaml
+
+# Deploy as CronJob
+kubectl apply -f deployments/k8s/examples/monitoring-agent.yaml
+
+# Deploy as Service
+kubectl apply -f deployments/k8s/examples/incident-response.yaml
+```
+
+See [deployments/k8s/](deployments/k8s/) for complete manifests and configuration.
+
+## Observability
+
+### Structured Logging
+
+```go
+import "github.com/oskarhane/goagent/pkg/logger"
+
+log := logger.New(&logger.Config{
+    Level:      logger.LevelInfo,
+    Output:     os.Stdout,
+    TracerName: "myagent", // Optional OpenTelemetry
+})
+
+cfg := &agent.Config{
+    Provider: provider,
+    Logger:   log,
+    // ...
+}
+```
+
+### OpenTelemetry Tracing
+
+```go
+log := logger.New(&logger.Config{
+    Level:      logger.LevelInfo,
+    Output:     os.Stdout,
+    TracerName: "myagent",
+})
+```
+
+Traces are automatically created for:
+- Agent execution (`agent.run`)
+- Provider API calls (`provider.complete`)
+- Tool execution
+
+## API Documentation
+
+Complete API documentation is available via godoc:
+
+```bash
+make docs
+# Visit http://localhost:6060/pkg/github.com/oskarhane/goagent/
+```
+
+Or view online at: https://pkg.go.dev/github.com/oskarhane/goagent
+
+Key packages:
+- [pkg/agent](https://pkg.go.dev/github.com/oskarhane/goagent/pkg/agent) - Agent orchestration
+- [pkg/providers/openai](https://pkg.go.dev/github.com/oskarhane/goagent/pkg/providers/openai) - OpenAI provider
+- [pkg/providers/vertex](https://pkg.go.dev/github.com/oskarhane/goagent/pkg/providers/vertex) - Vertex AI provider
+- [pkg/tools](https://pkg.go.dev/github.com/oskarhane/goagent/pkg/tools) - Tool system
+- [pkg/types](https://pkg.go.dev/github.com/oskarhane/goagent/pkg/types) - Core types
 
 ## Architecture
 
@@ -93,17 +354,19 @@ a := agent.New(provider).
 │   │   ├── http/         # HTTP request tool
 │   │   ├── shell/        # Shell execution tool
 │   │   └── k8s/          # Kubernetes query tool
+│   ├── logger/           # Structured logging
 │   └── types/            # Core type definitions
-├── internal/             # Private packages
-├── examples/             # Example implementations
-└── docs/                 # Documentation
+├── deployments/          # Deployment configurations
+│   ├── docker/           # Docker configurations
+│   └── k8s/              # Kubernetes manifests
+└── examples/             # Working examples
 ```
 
 ## Development
 
 ### Prerequisites
 
-- Go 1.26 or later
+- Go 1.25 or later
 - Make
 
 ### Setup
@@ -113,79 +376,52 @@ a := agent.New(provider).
 git clone https://github.com/oskarhane/goagent.git
 cd goagent
 
-# Install development dependencies
-make dev-setup
+# Run tests
+make test
 
-# Run development workflow
-make dev
+# Run linting
+make lint
+
+# Build binary
+make build
 ```
 
 ### Available Commands
 
 ```bash
-make help          # Show all available commands
-make build         # Build the CLI binary
 make test          # Run all tests
-make test-coverage # Run tests with coverage
 make lint          # Run linting
+make build         # Build the CLI binary
 make docs          # Start documentation server
 make clean         # Clean build artifacts
 ```
 
-## Testing
-
-```bash
-# Run all tests
-make test
-
-# Run tests with coverage
-make test-coverage
-
-# Run tests for CI
-make ci-test
-```
-
-## Documentation
-
-Start the documentation server:
-
-```bash
-make docs
-```
-
-Then visit: http://localhost:6060/pkg/github.com/oskarhane/goagent/
-
 ## Contributing
 
 1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/amazing-feature`)
+2. Create your feature branch (`git checkout -b oskar/amazing-feature`)
 3. Make your changes
-4. Run the development workflow (`make dev`)
-5. Commit your changes (`git commit -m 'Add amazing feature'`)
-6. Push to the branch (`git push origin feature/amazing-feature`)
+4. Run tests and linting (`make test && make lint`)
+5. Commit your changes
+6. Push to the branch
 7. Open a Pull Request
-
-### Development Standards
-
-- All public APIs must have complete GoDoc documentation
-- Test coverage must exceed 80%
-- All code must pass linting
-- Follow conventional commit messages
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+MIT License - see [LICENSE](LICENSE) for details.
 
 ## Status
 
-🚧 **Work in Progress** - This library is under active development for hackathon use cases.
+**Ready for Hackathons!** This library is production-ready with:
 
-Current development status:
 - [x] Project structure and build system
-- [ ] Core provider interface
-- [ ] OpenAI provider implementation
-- [ ] Vertex AI provider implementation
-- [ ] Tool system with JSON Schema validation
-- [ ] Agent reasoning loop
-- [ ] Built-in tools (HTTP, shell, Kubernetes)
-- [ ] Documentation and examples
+- [x] Core provider interface
+- [x] OpenAI provider implementation
+- [x] Vertex AI provider implementation
+- [x] Tool system with JSON Schema validation
+- [x] Agent reasoning loop
+- [x] Built-in tools (HTTP, shell, Kubernetes)
+- [x] Structured logging and tracing
+- [x] Docker and Kubernetes deployment
+- [x] Documentation and examples
+- [ ] Comprehensive test suite (in progress)
