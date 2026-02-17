@@ -1,6 +1,6 @@
 module k8s-monitoring
 
-go 1.26
+go 1.26.0
 
 require github.com/oskarhane/goagent v0.0.0
 
