@@ -1,3 +1,53 @@
+<!-- BEGIN GENERATED: AGENTS-MD -->
+# AGENTS.md
+
+Learnings and patterns for future agents working on this project.
+
+## Feedback Instructions
+
+TEST COMMANDS: [`make test`, `make ci-test`, `go test -v ./...`, `go test -v -race -coverprofile=coverage.out ./...`]
+BUILD COMMANDS: [`make build`, `go build -o bin/goagent ./cmd/goagent`, `make docker-build`, `make docker-build-service`, `make docker-build-cronjob`, `make docker-build-all`, `goreleaser release --clean`]
+LINT COMMANDS: [`make lint`, `make ci-lint`, `golangci-lint run --timeout=5m`]
+FORMAT COMMANDS: [`make fmt`, `goimports -w .`, `go fmt ./...`]
+
+## Project Overview
+
+PRIMARY LANGUAGES: [Go]
+
+See [@.agents-docs/languages.md](.agents-docs/languages.md) for detailed information.
+
+## Build System
+
+BUILD SYSTEMS: [Go modules (go.mod/go.sum), Make, Docker, GoReleaser (GitHub Actions)]
+
+See [@.agents-docs/build.md](.agents-docs/build.md) for detailed information.
+
+## Testing Framework
+
+TESTING FRAMEWORKS: [Go built-in testing, Testify]
+
+See [@.agents-docs/testing.md](.agents-docs/testing.md) for detailed information.
+
+## Architecture
+
+ARCHITECTURE PATTERN: Modular layered Go SDK (core agent loop + provider adapters + tool plugins) with thin CLI
+
+See [@.agents-docs/architecture.md](.agents-docs/architecture.md) for detailed information.
+
+## Deployment
+
+DEPLOYMENT STRATEGY: containerized Go service/job, deploy via Docker Compose or Kubernetes manifests; release via GoReleaser
+
+See [@.agents-docs/deployment.md](.agents-docs/deployment.md) for detailed information.
+
+---
+
+*This AGENTS.md was generated using agent-based project discovery.*
+*Detailed information is available in the .agents-docs/ directory.*
+<!-- END GENERATED: AGENTS-MD -->
+
+
+<!-- PRESERVED CONTENT FROM PREVIOUS VERSION -->
 # Agent Learnings
 
 ## Go Project Setup
@@ -15,18 +65,13 @@
 - **Gosec scanner**: Use `securego/gosec@master` action (not `securecodewarrior/github-action-gosec` which doesn't exist)
 - **GoReleaser**: Set up early for proper version/ldflags injection
 
-## Build System
-
-- **Makefile targets**: Provide test/lint/build/docs for dev workflow
-- **Shell scripts**: Keep build logic in scripts/ for CI reuse
-- **Test output**: `[no test files]` is expected until task-015; not an error
-
 ## API Design
 
 - **Struct field order**: Group logically (identity fields first, then content, then metadata) for API stability
 - **JSON tag consistency**: Use omitempty for optional fields; explicit tags prevent refactor breakage
 - **Helper constructors**: Provide NewXMessage() functions for common message types (better UX)
 - **Zero value handling**: Use pointer types (*float64) for numeric config fields when zero is a valid setting
+
 ## Provider Implementation
 
 - **Request mutation**: Copy pointer params before modification to avoid mutating caller's data
