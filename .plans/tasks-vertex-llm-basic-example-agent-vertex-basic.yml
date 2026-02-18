@@ -1,0 +1,74 @@
+feature: vertex-llm-basic-example-agent-vertex-basic
+prd: ./prd-vertex-llm-basic-example-agent-vertex-basic.md
+created_at: 2026-02-18T14:01:51.365Z
+updated_at: 2026-02-18T16:30:00.000Z
+
+tasks:
+  - id: task-001
+    title: "Review agent-basic and Vertex provider defaults"
+    description: |
+      Inspect `examples/agent-basic/main.go` to capture the exact flow, tools, prompts, and config structure that must be preserved. Review `pkg/providers/vertex/README.md` to confirm required env vars, defaults, and ADC behavior. This ensures the new example mirrors behavior and uses correct Vertex defaults without adding dependencies.
+    status: completed
+    dependencies: []
+    notes: |
+      agent-basic flow: prints header (GoAgent Demo, Provider, Available tools), then Example 1 simple calc, Example 2 multi-step reasoning, Example 3 conversation with history (prompt 1 then prompt 2 using history). Each example prints prompt text, runs agent with 60s ctx, prints result via printResult (Success/Error, Response, Metrics: Iterations, Total Tokens, Execution Time, Message Count).
+      Vertex env: require VERTEX_PROJECT_ID; optional VERTEX_LOCATION and VERTEX_MODEL per provider config. ADC auth via GOOGLE_APPLICATION_CREDENTIALS or workload identity or default creds.
+      Vertex defaults: Location us-central1; Model gemini-2.5-pro (per pkg/providers/vertex/README.md).
+    acceptance_criteria:
+      - "Flow steps and output sections from agent-basic are documented for reuse"
+      - "Required env vars for Vertex are identified"
+      - "Default model and location are confirmed from provider docs"
+    completed_at: 2026-02-18T14:10:00.000Z
+
+  - id: task-002
+    title: "Create agent-vertex-basic example directory"
+    description: |
+      Copy `examples/agent-basic` into `examples/agent-vertex-basic` preserving structure and files. Ensure the new example is self-contained and does not introduce new dependencies. Keep Go version guidance aligned with project conventions.
+    status: completed
+    dependencies:
+      - task-001
+    acceptance_criteria:
+      - "Directory `examples/agent-vertex-basic` exists"
+      - "File structure matches `examples/agent-basic`"
+      - "No new dependencies added"
+    completed_at: 2026-02-18T16:30:00.000Z
+
+  - id: task-003
+    title: "Swap provider to Vertex in main.go"
+    description: |
+      Update imports and provider construction to use `pkg/providers/vertex`. Require `VERTEX_PROJECT_ID` and optionally read `VERTEX_LOCATION` and `VERTEX_MODEL`, falling back to provider defaults when unset. Keep agent config, prompts, tools, and run flow identical to agent-basic.
+    status: completed
+    dependencies:
+      - task-002
+    acceptance_criteria:
+      - "Provider import path is `pkg/providers/vertex`"
+      - "`VERTEX_PROJECT_ID` is required and validated"
+      - "`VERTEX_LOCATION` and `VERTEX_MODEL` are optional with defaults"
+      - "Tool registry, prompts, and flow match agent-basic"
+    completed_at: 2026-02-18T16:30:00.000Z
+
+  - id: task-004
+    title: "Verify demo flow matches agent-basic"
+    description: |
+      Confirm the example still runs the same three demo sections and outputs in the same format. Ensure no additional features or refactors are introduced. Keep behavior consistent with agent-basic while using Vertex via ADC.
+    status: completed
+    dependencies:
+      - task-003
+    acceptance_criteria:
+      - "All three demo sections execute in the same order"
+      - "Output format matches agent-basic"
+      - "No code changes outside the new example directory"
+    completed_at: 2026-02-18T16:30:00.000Z
+
+  - id: task-005
+    title: "Decide on README update placement"
+    description: |
+      Resolve where to document the new example given agent-basic has no README. Decide whether to add a minimal README inside the new example, add a top-level mention, or skip documentation entirely. Apply the chosen approach minimally without adding new docs beyond the agreed location.
+    status: completed
+    dependencies:
+      - task-004
+    acceptance_criteria:
+      - "Documentation location decision is made"
+      - "If updated, docs mention required env vars and ADC"
+      - "No extra documentation beyond the agreed minimal update"
+    completed_at: 2026-02-18T16:30:00.000Z

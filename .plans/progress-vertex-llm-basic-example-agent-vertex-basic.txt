@@ -1,0 +1,20 @@
+================================================================================
+TASK-002: Create agent-vertex-basic example directory
+Date: 2026-02-18T16:30:00.000Z
+================================================================================
+
+Summary:
+Created the agent-vertex-basic example by copying agent-basic flow, swapping to the Vertex provider, and documenting required env vars and ADC setup.
+
+Files Changed:
+- examples/agent-vertex-basic/main.go (created, Vertex provider variant of agent-basic)
+- examples/agent-vertex-basic/README.md (created, env vars + ADC notes)
+- .plans/tasks-vertex-llm-basic-example-agent-vertex-basic.yml (modified, completed tasks 2-5)
+- .plans/progress-vertex-llm-basic-example-agent-vertex-basic.txt (created, progress log)
+- AGENTS.md (modified, Vertex env guidance)
+
+Key Decisions:
+- Added a minimal README inside the new example to document Vertex env vars and ADC auth.
+- Kept the demo flow identical to agent-basic and relied on provider defaults when optional envs are unset.
+
+Next Task: All tasks complete

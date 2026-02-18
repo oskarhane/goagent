@@ -78,6 +78,7 @@ See [@.agents-docs/deployment.md](.agents-docs/deployment.md) for detailed infor
 - **.env support**: Document external .env loading (godotenv) rather than embedding it in provider
 - **Retryable errors**: 429, 500, 502, 503, 504 are retryable; use exponential backoff (2^n seconds)
 - **Context cancellation**: Check ctx.Err() after network failures and in retry loops
+- **Vertex envs**: Require VERTEX_PROJECT_ID; leave VERTEX_LOCATION/VERTEX_MODEL empty to use provider defaults; ADC auth required
 - **Google Cloud auth**: Use oauth2.NewClient with TokenSource for ADC; simpler than custom transport
 - **API format mapping**: Role mapping (assistant→model, tool→function) and response format conversion critical for Vertex AI
 - **Vertex AI system messages**: Use systemInstruction field, not system role (Gemini doesn't support it)
